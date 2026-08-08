@@ -51,6 +51,8 @@ function bindEvents() {
     window.print();
   });
 
+  document.getElementById("saveFollowupBtn").addEventListener("click", saveFollowup);
+
   document.getElementById("applyFiltersBtn").addEventListener("click", renderClassResults);
   document.getElementById("clearFiltersBtn").addEventListener("click", clearFilters);
 
@@ -101,6 +103,11 @@ function registerUser(event) {
 
   if (!name || !email || !password || !role) {
     alert("Veuillez remplir le nom, l’email, le mot de passe et le profil.");
+    return;
+  }
+
+  if (role === "apprenant" && !classe) {
+    alert("Veuillez renseigner la classe de l’apprenant.");
     return;
   }
 
@@ -188,8 +195,8 @@ function updateAuthUI() {
   document.getElementById("welcomeTitle").textContent = `Bonjour ${currentUser.name}`;
   document.getElementById("welcomeText").textContent =
     currentUser.role === "enseignant"
-      ? "Vous pouvez créer une évaluation, corriger les copies et consulter les résultats collectifs."
-      : "Vous pouvez consulter vos résultats de dictées enregistrés par votre enseignant.";
+      ? "Vous pouvez créer une évaluation, corriger les copies, ajouter des appréciations et suivre les progrès."
+      : "Vous pouvez consulter vos résultats, appréciations et conseils de suivi.";
 
   teacherBtn.classList.toggle("hidden", currentUser.role !== "enseignant");
   studentBtn.classList.toggle("hidden", currentUser.role !== "apprenant");
@@ -427,6 +434,14 @@ function correctAndSaveCopy() {
     errors: correction.errors,
     correctionHTML: correction.outputHTML,
     appreciation: appreciation,
+
+    teacherAppreciation: "",
+    studentStrengths: "",
+    studentDifficulties: "",
+    remediationAdvice: "",
+    followupDate: "",
+    followupStatus: "À revoir",
+
     correctedAt: new Date().toISOString()
   };
 
@@ -443,7 +458,7 @@ function correctAndSaveCopy() {
   updateDashboardStats();
   showSelectedEvaluationInfo();
 
-  alert("Copie corrigée et résultat enregistré.");
+  alert("Copie corrigée et résultat enregistré. Vous pouvez maintenant compléter l’appréciation et le suivi.");
 
   clearCopyForm();
 }
@@ -518,8 +533,7 @@ function compareTexts(reference, student) {
 }
 
 function renderSingleResult(evaluation, result) {
-  const section = document.getElementById("singleResultSection");
-  section.classList.remove("hidden-section");
+  document.getElementById("singleResultSection").classList.remove("hidden-section");
 
   document.getElementById("scoreValue").textContent = `${result.score}%`;
 
@@ -547,23 +561,88 @@ function renderSingleResult(evaluation, result) {
 
   if (result.errors.length === 0) {
     errorList.innerHTML = "<li>Bravo ! Aucune erreur repérée.</li>";
+  } else {
+    errorList.innerHTML = "";
+
+    result.errors.forEach(function (error) {
+      const li = document.createElement("li");
+
+      li.innerHTML = `
+        Position ${error.position} :
+        tu as écrit <strong>${escapeHTML(error.given)}</strong>,
+        il fallait écrire <strong>${escapeHTML(error.expected)}</strong>.
+        <em>Type probable : ${escapeHTML(error.type)}</em>.
+      `;
+
+      errorList.appendChild(li);
+    });
+  }
+
+  document.getElementById("teacherAppreciation").value =
+    result.teacherAppreciation || generateAutomaticTeacherAppreciation(result.score, result.errorCount);
+
+  document.getElementById("studentStrengths").value =
+    result.studentStrengths || generateStrengths(result.score);
+
+  document.getElementById("studentDifficulties").value =
+    result.studentDifficulties || generateDifficulties(result.errors);
+
+  document.getElementById("remediationAdvice").value =
+    result.remediationAdvice || generateRemediationAdvice(result.score);
+
+  document.getElementById("followupDate").value = result.followupDate || "";
+  document.getElementById("followupStatus").value = result.followupStatus || "À revoir";
+  document.getElementById("followupStatusMessage").textContent = "";
+  document.getElementById("followupStatusMessage").className = "scan-status";
+}
+
+function saveFollowup() {
+  if (!lastCorrection || !lastCorrection.evaluation || !lastCorrection.result) {
+    alert("Aucune correction récente à compléter.");
     return;
   }
 
-  errorList.innerHTML = "";
+  const teacherAppreciation = document.getElementById("teacherAppreciation").value.trim();
+  const studentStrengths = document.getElementById("studentStrengths").value.trim();
+  const studentDifficulties = document.getElementById("studentDifficulties").value.trim();
+  const remediationAdvice = document.getElementById("remediationAdvice").value.trim();
+  const followupDate = document.getElementById("followupDate").value;
+  const followupStatus = document.getElementById("followupStatus").value;
 
-  result.errors.forEach(function (error) {
-    const li = document.createElement("li");
-
-    li.innerHTML = `
-      Position ${error.position} :
-      tu as écrit <strong>${escapeHTML(error.given)}</strong>,
-      il fallait écrire <strong>${escapeHTML(error.expected)}</strong>.
-      <em>Type probable : ${escapeHTML(error.type)}</em>.
-    `;
-
-    errorList.appendChild(li);
+  const evaluation = evaluations.find(function (item) {
+    return item.id === lastCorrection.evaluation.id;
   });
+
+  if (!evaluation) {
+    alert("Évaluation introuvable.");
+    return;
+  }
+
+  const copy = evaluation.copies.find(function (item) {
+    return item.id === lastCorrection.result.id;
+  });
+
+  if (!copy) {
+    alert("Résultat de l’élève introuvable.");
+    return;
+  }
+
+  copy.teacherAppreciation = teacherAppreciation;
+  copy.studentStrengths = studentStrengths;
+  copy.studentDifficulties = studentDifficulties;
+  copy.remediationAdvice = remediationAdvice;
+  copy.followupDate = followupDate;
+  copy.followupStatus = followupStatus;
+
+  saveEvaluations();
+
+  lastCorrection.result = copy;
+
+  const message = document.getElementById("followupStatusMessage");
+  message.textContent = "Appréciation et suivi pédagogique enregistrés avec succès.";
+  message.className = "scan-status success-status";
+
+  renderClassResults();
 }
 
 function renderClassResults() {
@@ -594,7 +673,7 @@ function renderClassResults() {
   });
 
   if (rows.length === 0) {
-    body.innerHTML = `<tr><td colspan="8">Aucun résultat trouvé.</td></tr>`;
+    body.innerHTML = `<tr><td colspan="10">Aucun résultat trouvé.</td></tr>`;
     return;
   }
 
@@ -611,7 +690,9 @@ function renderClassResults() {
       <td class="${getScoreClass(item.copy.score)}">${item.copy.score}%</td>
       <td>${item.copy.note}/${item.copy.scale}</td>
       <td>${item.copy.errorCount}</td>
-      <td>${escapeHTML(item.copy.appreciation)}</td>
+      <td><span class="followup-badge">${escapeHTML(item.copy.followupStatus || "À revoir")}</span></td>
+      <td>${item.copy.followupDate ? formatDate(item.copy.followupDate) : "Non renseignée"}</td>
+      <td>${escapeHTML(item.copy.teacherAppreciation || item.copy.appreciation)}</td>
     `;
 
     body.appendChild(tr);
@@ -674,7 +755,13 @@ function searchStudentResults() {
       <p><strong>Score :</strong> <span class="${getScoreClass(item.copy.score)}">${item.copy.score}%</span></p>
       <p><strong>Note :</strong> ${item.copy.note}/${item.copy.scale}</p>
       <p><strong>Nombre d’erreurs :</strong> ${item.copy.errorCount}</p>
-      <p><strong>Appréciation :</strong> ${escapeHTML(item.copy.appreciation)}</p>
+      <p><strong>Appréciation automatique :</strong> ${escapeHTML(item.copy.appreciation)}</p>
+      <p><strong>Appréciation de l’enseignant :</strong> ${escapeHTML(item.copy.teacherAppreciation || item.copy.appreciation)}</p>
+      <p><strong>Points forts :</strong> ${escapeHTML(item.copy.studentStrengths || "Non renseigné")}</p>
+      <p><strong>Difficultés à renforcer :</strong> ${escapeHTML(item.copy.studentDifficulties || "Non renseigné")}</p>
+      <p><strong>Conseils de remédiation :</strong> ${escapeHTML(item.copy.remediationAdvice || "Non renseigné")}</p>
+      <p><strong>Statut du suivi :</strong> <span class="followup-badge">${escapeHTML(item.copy.followupStatus || "À revoir")}</span></p>
+      <p><strong>Date de suivi proposée :</strong> ${item.copy.followupDate ? formatDate(item.copy.followupDate) : "Non renseignée"}</p>
     `;
 
     box.appendChild(div);
@@ -690,7 +777,7 @@ function clearStudentSearch() {
 
 function exportAllResults() {
   const lines = [];
-  lines.push("Date;Dictée;Classe;Élève;Score;Note;Barème;Erreurs;Appréciation");
+  lines.push("Date;Dictée;Classe;Élève;Score;Note;Barème;Erreurs;Statut suivi;Date suivi;Appréciation;Points forts;Difficultés;Conseils");
 
   evaluations.forEach(function (evaluation) {
     if (currentUser && currentUser.role === "enseignant" && evaluation.teacherId !== currentUser.id) {
@@ -707,7 +794,12 @@ function exportAllResults() {
         copy.note,
         copy.scale,
         copy.errorCount,
-        copy.appreciation
+        copy.followupStatus || "À revoir",
+        copy.followupDate || "",
+        copy.teacherAppreciation || copy.appreciation,
+        copy.studentStrengths || "",
+        copy.studentDifficulties || "",
+        copy.remediationAdvice || ""
       ].map(escapeCSV).join(";"));
     });
   });
@@ -725,7 +817,7 @@ function exportAllResults() {
   const link = document.createElement("a");
 
   link.href = url;
-  link.download = "resultats_dictee_coach_ia.csv";
+  link.download = "resultats_et_suivi_dictee_coach_ia.csv";
   link.click();
 
   URL.revokeObjectURL(url);
@@ -770,6 +862,7 @@ async function scanTeacherImage() {
 
     setScanStatus(status, "Texte extrait. Vérifiez-le avant l’enregistrement.", "success-status");
   } catch (error) {
+    console.error(error);
     setScanStatus(status, "Erreur de lecture. Essayez avec une photo plus nette.", "error-status");
   } finally {
     button.disabled = false;
@@ -796,6 +889,7 @@ async function scanStudentImage() {
 
     setScanStatus(status, "Texte extrait. Relisez-le avant correction.", "success-status");
   } catch (error) {
+    console.error(error);
     setScanStatus(status, "Erreur de lecture. Essayez avec une photo plus nette.", "error-status");
   } finally {
     button.disabled = false;
@@ -852,6 +946,68 @@ function initializeDate() {
   if (dateInput) {
     dateInput.value = new Date().toISOString().split("T")[0];
   }
+}
+
+function generateAutomaticTeacherAppreciation(score, errorCount) {
+  if (score >= 90) {
+    return `Très bon travail. L’élève maîtrise globalement la dictée avec seulement ${errorCount} erreur(s) repérée(s). Il faut maintenir les efforts et continuer la relecture.`;
+  }
+
+  if (score >= 70) {
+    return `Bon travail dans l’ensemble. L’élève présente des acquis solides, mais certaines erreurs doivent être retravaillées avec attention.`;
+  }
+
+  if (score >= 50) {
+    return `Résultat moyen. L’élève comprend globalement l’exercice, mais doit renforcer l’orthographe, les accords et la relecture.`;
+  }
+
+  return `Des difficultés importantes sont observées. L’élève a besoin d’un accompagnement régulier et d’exercices de remédiation ciblés.`;
+}
+
+function generateStrengths(score) {
+  if (score >= 90) {
+    return "Bonne maîtrise générale, attention soutenue, respect du texte et effort de relecture.";
+  }
+
+  if (score >= 70) {
+    return "Présence d’acquis, effort de transcription, compréhension globale du texte.";
+  }
+
+  if (score >= 50) {
+    return "Quelques acquis sont visibles. L’élève peut progresser avec un accompagnement régulier.";
+  }
+
+  return "L’élève a participé à l’exercice et dispose d’une base à renforcer progressivement.";
+}
+
+function generateDifficulties(errors) {
+  if (!errors || errors.length === 0) {
+    return "Aucune difficulté majeure repérée dans cette correction.";
+  }
+
+  const types = errors.map(function (error) {
+    return error.type;
+  });
+
+  const uniqueTypes = [...new Set(types)];
+
+  return uniqueTypes.join(", ");
+}
+
+function generateRemediationAdvice(score) {
+  if (score >= 90) {
+    return "Poursuivre les exercices de dictée, maintenir la relecture et travailler les détails de ponctuation.";
+  }
+
+  if (score >= 70) {
+    return "Reprendre les mots signalés, faire une courte dictée de renforcement et vérifier les accords dans chaque phrase.";
+  }
+
+  if (score >= 50) {
+    return "Prévoir des exercices ciblés sur les accords, les homophones, la conjugaison et la ponctuation.";
+  }
+
+  return "Mettre en place un accompagnement rapproché : reprise des mots difficiles, dictées courtes, lecture régulière et correction guidée.";
 }
 
 function generateId(prefix) {

@@ -97,9 +97,7 @@
       <div>
         <span class="pill">Application ludique de dictée</span>
         <h2 id="welcomeTitle">Bienvenue</h2>
-        <p id="welcomeText">
-          Choisissez votre espace pour commencer.
-        </p>
+        <p id="welcomeText">Choisissez votre espace pour commencer.</p>
       </div>
 
       <div class="hero-emoji">📘✨</div>
@@ -117,13 +115,14 @@
       <h2>Tableau de bord enseignant</h2>
 
       <p class="hint">
-        Créez une évaluation, corrigez les copies des élèves et suivez les résultats de toute la classe.
+        Créez une évaluation, corrigez les copies des élèves, ajoutez une appréciation
+        et suivez les résultats de toute la classe.
       </p>
 
       <div class="dashboard-grid">
         <button id="showCreateEvaluationBtn">➕ Créer une évaluation</button>
         <button id="showCorrectCopyBtn" class="secondary">📝 Ajouter / corriger une copie</button>
-        <button id="showClassResultsBtn" class="secondary">📊 Résultats de la classe</button>
+        <button id="showClassResultsBtn" class="secondary">📊 Résultats et suivi de la classe</button>
         <button id="exportAllBtn" class="secondary">📥 Exporter les résultats</button>
         <button id="resetAppBtn" class="danger">🗑️ Réinitialiser</button>
         <button class="secondary backHomeBtn">🏠 Accueil</button>
@@ -290,13 +289,71 @@
         <li>Aucune correction effectuée.</li>
       </ul>
 
+      <div class="followup-panel">
+        <h3>🌱 Appréciation et suivi pédagogique</h3>
+
+        <p class="hint">
+          L’application propose automatiquement des éléments de suivi. L’enseignant peut les modifier
+          avant d’enregistrer l’appréciation finale.
+        </p>
+
+        <label for="teacherAppreciation">Appréciation de l’enseignant</label>
+        <textarea
+          id="teacherAppreciation"
+          placeholder="Exemple : L’élève montre une bonne compréhension générale, mais doit renforcer les accords."
+        ></textarea>
+
+        <label for="studentStrengths">Points forts observés</label>
+        <textarea
+          id="studentStrengths"
+          placeholder="Exemple : Bonne concentration, respect de la structure du texte, efforts visibles."
+        ></textarea>
+
+        <label for="studentDifficulties">Difficultés à renforcer</label>
+        <textarea
+          id="studentDifficulties"
+          placeholder="Exemple : Accords sujet-verbe, orthographe lexicale, ponctuation, homophones."
+        ></textarea>
+
+        <label for="remediationAdvice">Conseils de remédiation</label>
+        <textarea
+          id="remediationAdvice"
+          placeholder="Exemple : Relire chaque phrase, souligner les verbes, vérifier les accords."
+        ></textarea>
+
+        <div class="form-grid">
+          <div>
+            <label for="followupDate">Date de suivi proposée</label>
+            <input type="date" id="followupDate" />
+          </div>
+
+          <div>
+            <label for="followupStatus">Statut du suivi</label>
+            <select id="followupStatus">
+              <option value="À revoir">À revoir</option>
+              <option value="En progression">En progression</option>
+              <option value="Acquis">Acquis</option>
+              <option value="Besoin d’accompagnement">Besoin d’accompagnement</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="saveFollowupBtn" class="secondary">
+            Enregistrer l’appréciation et le suivi
+          </button>
+        </div>
+
+        <p id="followupStatusMessage" class="scan-status"></p>
+      </div>
+
       <div class="actions">
         <button id="printSingleBtn" class="secondary">Imprimer ce résultat</button>
       </div>
     </section>
 
     <section class="card hidden-section" id="classResultsSection">
-      <h2>Résultats collectifs</h2>
+      <h2>Résultats collectifs et suivi</h2>
 
       <div class="filter-grid">
         <div>
@@ -334,12 +391,14 @@
               <th>Score</th>
               <th>Note</th>
               <th>Erreurs</th>
+              <th>Statut</th>
+              <th>Suivi</th>
               <th>Appréciation</th>
             </tr>
           </thead>
           <tbody id="classResultsBody">
             <tr>
-              <td colspan="8">Aucun résultat enregistré.</td>
+              <td colspan="10">Aucun résultat enregistré.</td>
             </tr>
           </tbody>
         </table>
@@ -350,7 +409,7 @@
       <h2>Espace apprenant</h2>
 
       <p class="hint">
-        Consultez vos résultats par nom, classe et date d’évaluation.
+        Consultez vos résultats, votre appréciation et les conseils de suivi proposés par l’enseignant.
       </p>
 
       <div class="form-grid">
