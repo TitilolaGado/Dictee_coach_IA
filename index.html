@@ -14,45 +14,97 @@
   <header class="app-header">
     <div>
       <h1>Dictée Coach IA</h1>
-      <p>Application ludique d’aide à la correction des dictées</p>
+      <p>Correction, suivi collectif et consultation des résultats de dictée</p>
     </div>
 
-    <span class="badge">Mode classe</span>
+    <span class="badge">Application pédagogique</span>
   </header>
 
-  <section class="mode-selection" id="modeSelection">
-    <h2>Choisissez votre espace</h2>
-    <p>Sélectionnez le mode d’utilisation de l’application.</p>
+  <section class="home-section" id="homeSection">
+    <h2>Bienvenue</h2>
+    <p>
+      Cette application permet à l’enseignant de créer une évaluation de dictée,
+      de corriger les copies des élèves, de suivre les résultats de la classe et de permettre
+      aux apprenants de consulter leurs résultats par date.
+    </p>
 
-    <div class="mode-buttons">
-      <button id="teacherModeBtn">Espace enseignant</button>
-      <button id="studentModeBtn">Espace élève</button>
+    <div class="home-buttons">
+      <button id="teacherDashboardBtn">Tableau de bord enseignant</button>
+      <button id="studentResultsBtn" class="secondary">Consulter mes résultats</button>
     </div>
   </section>
 
   <main class="container">
 
-    <!-- ESPACE ENSEIGNANT -->
-    <section class="card teacher-card hidden-section" id="teacherSection">
-      <h2>1. Espace enseignant</h2>
+    <!-- TABLEAU DE BORD ENSEIGNANT -->
+    <section class="card hidden-section" id="teacherDashboardSection">
+      <h2>Tableau de bord enseignant</h2>
 
       <p class="hint">
-        Saisissez ici le texte correct de la dictée ou importez-le à partir d’une photo ou d’un scan.
-        Ce texte servira de référence pour la correction.
+        L’enseignant crée une évaluation, ajoute les copies des élèves, corrige les dictées
+        et consulte les résultats de toute la classe.
       </p>
 
-      <label for="referenceText">Texte de référence</label>
+      <div class="dashboard-grid">
+        <button id="showCreateEvaluationBtn">Créer une évaluation</button>
+        <button id="showCorrectCopyBtn" class="secondary">Ajouter / corriger une copie</button>
+        <button id="showClassResultsBtn" class="secondary">Résultats de la classe</button>
+        <button id="exportAllBtn" class="secondary">Exporter les résultats</button>
+        <button id="resetAppBtn" class="danger">Réinitialiser l’application</button>
+        <button class="secondary backHomeBtn">Retour à l’accueil</button>
+      </div>
+    </section>
+
+    <!-- CRÉER UNE ÉVALUATION -->
+    <section class="card hidden-section" id="createEvaluationSection">
+      <h2>1. Créer une évaluation de dictée</h2>
+
+      <p class="hint">
+        Renseignez les informations de l’évaluation et le texte original de la dictée.
+        Ce texte servira de base pour toutes les corrections.
+      </p>
+
+      <label for="evaluationTitle">Titre de la dictée</label>
+      <input
+        type="text"
+        id="evaluationTitle"
+        placeholder="Exemple : Dictée sur l’intelligence artificielle"
+      />
+
+      <label for="evaluationClass">Classe</label>
+      <input
+        type="text"
+        id="evaluationClass"
+        placeholder="Exemple : 4e"
+      />
+
+      <label for="evaluationDate">Date de l’évaluation</label>
+      <input
+        type="date"
+        id="evaluationDate"
+      />
+
+      <label for="evaluationScale">Barème</label>
+      <input
+        type="number"
+        id="evaluationScale"
+        placeholder="Exemple : 20"
+        min="1"
+        value="20"
+      />
+
+      <label for="referenceText">Texte original de la dictée</label>
       <textarea
         id="referenceText"
-        placeholder="Exemple : Aujourd’hui, les élèves découvrent de nouveaux outils numériques en classe."
+        placeholder="Saisissez ici le texte original de la dictée..."
       ></textarea>
 
       <div class="scan-zone">
         <h3>Importer le modèle par photo ou scan</h3>
 
         <p class="hint">
-          Vous pouvez prendre en photo le modèle manuscrit ou importer une image déjà scannée.
-          Le texte reconnu apparaîtra dans la zone ci-dessus.
+          Vous pouvez prendre en photo le modèle de dictée ou importer une image déjà scannée.
+          Le texte reconnu apparaîtra dans la zone du texte original.
         </p>
 
         <input
@@ -63,56 +115,66 @@
         />
 
         <div class="actions">
-          <button id="scanTeacherBtn" class="secondary">
-            Lire l’image du modèle
-          </button>
+          <button id="scanTeacherBtn" class="secondary">Lire l’image du modèle</button>
         </div>
 
         <p id="teacherScanStatus" class="scan-status"></p>
       </div>
 
       <p class="warning-text">
-        Attention : la lecture automatique peut contenir des erreurs. L’enseignant doit toujours vérifier
-        le texte extrait avant de l’enregistrer comme référence.
+        Attention : la lecture automatique peut contenir des erreurs. L’enseignant doit toujours
+        vérifier le texte extrait avant d’enregistrer l’évaluation.
       </p>
 
       <div class="actions">
-        <button id="saveReferenceBtn">Enregistrer la dictée</button>
-        <button id="showReferenceBtn" class="secondary">Afficher / cacher</button>
-        <button id="clearBtn" class="danger">Réinitialiser</button>
-        <button class="secondary backBtn">Retour au choix</button>
+        <button id="saveEvaluationBtn">Enregistrer l’évaluation</button>
+        <button id="clearEvaluationFormBtn" class="secondary">Vider le formulaire</button>
+        <button class="secondary backDashboardBtn">Retour au tableau de bord</button>
       </div>
-
-      <div id="referencePreview" class="preview hidden"></div>
     </section>
 
-    <!-- ESPACE ÉLÈVE -->
-    <section class="card student-card hidden-section" id="studentSection">
-      <h2>2. Espace élève</h2>
+    <!-- AJOUTER / CORRIGER UNE COPIE -->
+    <section class="card hidden-section" id="correctCopySection">
+      <h2>2. Ajouter et corriger une copie élève</h2>
 
       <p class="hint">
-        L’élève peut saisir sa dictée directement ou importer une photo de sa copie manuscrite.
+        Sélectionnez une évaluation existante, renseignez l’identité de l’élève,
+        importez ou saisissez sa copie, puis lancez la correction.
       </p>
 
-      <label for="studentName">Nom de l’élève</label>
+      <label for="evaluationSelect">Évaluation</label>
+      <select id="evaluationSelect">
+        <option value="">Aucune évaluation disponible</option>
+      </select>
+
+      <div id="selectedEvaluationInfo" class="info-box hidden"></div>
+
+      <label for="studentFullName">Nom et prénom de l’élève</label>
       <input
         type="text"
-        id="studentName"
-        placeholder="Exemple : Aïcha"
+        id="studentFullName"
+        placeholder="Exemple : Aïcha KORA"
       />
 
-      <label for="studentText">Texte de l’élève</label>
+      <label for="studentClass">Classe de l’élève</label>
+      <input
+        type="text"
+        id="studentClass"
+        placeholder="Exemple : 4e"
+      />
+
+      <label for="studentText">Texte de la copie élève</label>
       <textarea
         id="studentText"
-        placeholder="Écris ici ta dictée ou importe une photo de ta copie..."
+        placeholder="Saisissez ici le texte de l’élève ou importez une photo de sa copie..."
       ></textarea>
 
       <div class="scan-zone">
         <h3>Importer la copie manuscrite par photo ou scan</h3>
 
         <p class="hint">
-          Prends une photo nette de ta copie. Le texte reconnu sera placé dans la zone ci-dessus.
-          Il faut le relire avant de lancer la correction.
+          Prenez une photo nette de la copie. Le texte reconnu sera placé dans la zone ci-dessus.
+          Il doit être relu avant la correction.
         </p>
 
         <input
@@ -123,31 +185,27 @@
         />
 
         <div class="actions">
-          <button id="scanStudentBtn" class="secondary">
-            Lire l’image de ma copie
-          </button>
+          <button id="scanStudentBtn" class="secondary">Lire l’image de la copie</button>
         </div>
 
         <p id="studentScanStatus" class="scan-status"></p>
       </div>
 
       <p class="warning-text">
-        Attention : si l’écriture est peu lisible, certains mots peuvent être mal reconnus.
-        Relis le texte extrait avant de corriger.
+        La correction automatique est une aide. L’enseignant doit vérifier le texte extrait,
+        valider les erreurs et apprécier le résultat final.
       </p>
 
       <div class="actions">
-        <button id="correctBtn">Corriger ma dictée</button>
-        <button id="hintBtn" class="secondary">Voir un indice</button>
-        <button class="secondary backBtn">Retour au choix</button>
+        <button id="correctAndSaveBtn">Corriger et enregistrer le résultat</button>
+        <button id="clearCopyFormBtn" class="secondary">Vider la copie</button>
+        <button class="secondary backDashboardBtn">Retour au tableau de bord</button>
       </div>
-
-      <div id="hintBox" class="hint-box hidden"></div>
     </section>
 
-    <!-- RÉSULTAT -->
-    <section class="card result-card hidden-section" id="resultSection">
-      <h2>3. Résultat de la correction</h2>
+    <!-- RÉSULTAT DE LA DERNIÈRE CORRECTION -->
+    <section class="card hidden-section" id="singleResultSection">
+      <h2>3. Résultat de la dernière correction</h2>
 
       <div class="score-zone">
         <div class="score-circle">
@@ -157,7 +215,7 @@
         <div class="score-details">
           <h3 id="feedbackTitle">En attente de correction</h3>
           <p id="feedbackMessage">
-            Saisissez un texte de référence et une dictée d’élève pour commencer.
+            Le résultat détaillé apparaîtra après correction.
           </p>
         </div>
       </div>
@@ -180,37 +238,114 @@
       </div>
 
       <h3>Correction interactive</h3>
-
       <div id="correctionOutput" class="correction-output">
         La correction apparaîtra ici.
       </div>
 
       <h3>Liste des erreurs</h3>
-
       <ul id="errorList" class="error-list">
         <li>Aucune correction effectuée.</li>
       </ul>
 
       <div class="actions">
-        <button id="printBtn" class="secondary">Imprimer le résultat</button>
-        <button id="exportBtn" class="secondary">Exporter en texte</button>
+        <button id="printSingleBtn" class="secondary">Imprimer ce résultat</button>
       </div>
     </section>
 
-    <!-- MINI-JEU -->
-    <section class="card game-card hidden-section" id="gameSection">
-      <h2>4. Mini-jeu de remédiation</h2>
+    <!-- RÉSULTATS DE CLASSE -->
+    <section class="card hidden-section" id="classResultsSection">
+      <h2>4. Résultats collectifs de la classe</h2>
 
       <p class="hint">
-        Après la correction, l’élève peut reprendre les mots mal écrits pour progresser.
+        Les résultats enregistrés s’affichent ici. Vous pouvez filtrer par évaluation,
+        par classe ou par nom d’élève.
       </p>
 
-      <div id="gameBox" class="game-box">
-        <p>Aucun mot à retravailler pour le moment.</p>
+      <div class="filter-grid">
+        <div>
+          <label for="filterEvaluation">Filtrer par évaluation</label>
+          <select id="filterEvaluation">
+            <option value="">Toutes les évaluations</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="filterClass">Filtrer par classe</label>
+          <input type="text" id="filterClass" placeholder="Exemple : 4e" />
+        </div>
+
+        <div>
+          <label for="filterStudent">Filtrer par élève</label>
+          <input type="text" id="filterStudent" placeholder="Nom ou prénom" />
+        </div>
       </div>
 
       <div class="actions">
-        <button id="startGameBtn">Lancer le mini-jeu</button>
+        <button id="applyFiltersBtn">Appliquer les filtres</button>
+        <button id="clearFiltersBtn" class="secondary">Effacer les filtres</button>
+        <button class="secondary backDashboardBtn">Retour au tableau de bord</button>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Dictée</th>
+              <th>Classe</th>
+              <th>Élève</th>
+              <th>Score</th>
+              <th>Note</th>
+              <th>Erreurs</th>
+              <th>Appréciation</th>
+            </tr>
+          </thead>
+          <tbody id="classResultsBody">
+            <tr>
+              <td colspan="8">Aucun résultat enregistré.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ESPACE CONSULTATION ÉLÈVE -->
+    <section class="card hidden-section" id="studentConsultationSection">
+      <h2>Espace consultation élève</h2>
+
+      <p class="hint">
+        L’apprenant peut consulter ses résultats en renseignant son nom, sa classe
+        et éventuellement une date d’évaluation.
+      </p>
+
+      <label for="searchStudentName">Nom et prénom</label>
+      <input
+        type="text"
+        id="searchStudentName"
+        placeholder="Exemple : Aïcha KORA"
+      />
+
+      <label for="searchStudentClass">Classe</label>
+      <input
+        type="text"
+        id="searchStudentClass"
+        placeholder="Exemple : 4e"
+      />
+
+      <label for="searchEvaluationDate">Date d’évaluation</label>
+      <input
+        type="date"
+        id="searchEvaluationDate"
+      />
+
+      <div class="actions">
+        <button id="searchStudentResultsBtn">Voir mes résultats</button>
+        <button id="clearStudentSearchBtn" class="secondary">Effacer</button>
+        <button class="secondary backHomeBtn">Retour à l’accueil</button>
+      </div>
+
+      <div id="studentResultsBox" class="student-results-box">
+        Aucun résultat recherché pour le moment.
       </div>
     </section>
 
@@ -218,14 +353,11 @@
 
   <footer>
     <p>
-      Dictée Coach IA — outil d’assistance. La validation finale reste sous la responsabilité de l’enseignant.
+      Dictée Coach IA — outil d’assistance pédagogique. La décision finale reste sous la responsabilité de l’enseignant.
     </p>
   </footer>
 
-  <!-- Bibliothèque OCR -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-
-  <!-- Code principal -->
   <script src="script.js"></script>
 </body>
 </html>

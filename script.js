@@ -1,31 +1,54 @@
-let referenceText = "";
-let lastErrors = [];
+let evaluations = [];
+let lastCorrection = null;
 
-const modeSelection = document.getElementById("modeSelection");
-const teacherSection = document.getElementById("teacherSection");
-const studentSection = document.getElementById("studentSection");
-const resultSection = document.getElementById("resultSection");
-const gameSection = document.getElementById("gameSection");
+const homeSection = document.getElementById("homeSection");
 
-const teacherModeBtn = document.getElementById("teacherModeBtn");
-const studentModeBtn = document.getElementById("studentModeBtn");
-const backBtns = document.querySelectorAll(".backBtn");
+const teacherDashboardSection = document.getElementById("teacherDashboardSection");
+const createEvaluationSection = document.getElementById("createEvaluationSection");
+const correctCopySection = document.getElementById("correctCopySection");
+const singleResultSection = document.getElementById("singleResultSection");
+const classResultsSection = document.getElementById("classResultsSection");
+const studentConsultationSection = document.getElementById("studentConsultationSection");
 
-const referenceInput = document.getElementById("referenceText");
-const studentInput = document.getElementById("studentText");
-const studentNameInput = document.getElementById("studentName");
+const teacherDashboardBtn = document.getElementById("teacherDashboardBtn");
+const studentResultsBtn = document.getElementById("studentResultsBtn");
 
-const saveReferenceBtn = document.getElementById("saveReferenceBtn");
-const showReferenceBtn = document.getElementById("showReferenceBtn");
-const clearBtn = document.getElementById("clearBtn");
-const correctBtn = document.getElementById("correctBtn");
-const hintBtn = document.getElementById("hintBtn");
-const printBtn = document.getElementById("printBtn");
-const exportBtn = document.getElementById("exportBtn");
-const startGameBtn = document.getElementById("startGameBtn");
+const showCreateEvaluationBtn = document.getElementById("showCreateEvaluationBtn");
+const showCorrectCopyBtn = document.getElementById("showCorrectCopyBtn");
+const showClassResultsBtn = document.getElementById("showClassResultsBtn");
+const exportAllBtn = document.getElementById("exportAllBtn");
+const resetAppBtn = document.getElementById("resetAppBtn");
 
-const referencePreview = document.getElementById("referencePreview");
-const hintBox = document.getElementById("hintBox");
+const backHomeBtns = document.querySelectorAll(".backHomeBtn");
+const backDashboardBtns = document.querySelectorAll(".backDashboardBtn");
+
+const evaluationTitle = document.getElementById("evaluationTitle");
+const evaluationClass = document.getElementById("evaluationClass");
+const evaluationDate = document.getElementById("evaluationDate");
+const evaluationScale = document.getElementById("evaluationScale");
+const referenceText = document.getElementById("referenceText");
+
+const teacherImageInput = document.getElementById("teacherImageInput");
+const scanTeacherBtn = document.getElementById("scanTeacherBtn");
+const teacherScanStatus = document.getElementById("teacherScanStatus");
+
+const saveEvaluationBtn = document.getElementById("saveEvaluationBtn");
+const clearEvaluationFormBtn = document.getElementById("clearEvaluationFormBtn");
+
+const evaluationSelect = document.getElementById("evaluationSelect");
+const selectedEvaluationInfo = document.getElementById("selectedEvaluationInfo");
+
+const studentFullName = document.getElementById("studentFullName");
+const studentClass = document.getElementById("studentClass");
+const studentText = document.getElementById("studentText");
+
+const studentImageInput = document.getElementById("studentImageInput");
+const scanStudentBtn = document.getElementById("scanStudentBtn");
+const studentScanStatus = document.getElementById("studentScanStatus");
+
+const correctAndSaveBtn = document.getElementById("correctAndSaveBtn");
+const clearCopyFormBtn = document.getElementById("clearCopyFormBtn");
+
 const scoreValue = document.getElementById("scoreValue");
 const feedbackTitle = document.getElementById("feedbackTitle");
 const feedbackMessage = document.getElementById("feedbackMessage");
@@ -34,175 +57,314 @@ const correctWords = document.getElementById("correctWords");
 const errorWords = document.getElementById("errorWords");
 const correctionOutput = document.getElementById("correctionOutput");
 const errorList = document.getElementById("errorList");
-const gameBox = document.getElementById("gameBox");
+const printSingleBtn = document.getElementById("printSingleBtn");
 
-const teacherImageInput = document.getElementById("teacherImageInput");
-const studentImageInput = document.getElementById("studentImageInput");
+const filterEvaluation = document.getElementById("filterEvaluation");
+const filterClass = document.getElementById("filterClass");
+const filterStudent = document.getElementById("filterStudent");
+const applyFiltersBtn = document.getElementById("applyFiltersBtn");
+const clearFiltersBtn = document.getElementById("clearFiltersBtn");
+const classResultsBody = document.getElementById("classResultsBody");
 
-const scanTeacherBtn = document.getElementById("scanTeacherBtn");
-const scanStudentBtn = document.getElementById("scanStudentBtn");
+const searchStudentName = document.getElementById("searchStudentName");
+const searchStudentClass = document.getElementById("searchStudentClass");
+const searchEvaluationDate = document.getElementById("searchEvaluationDate");
+const searchStudentResultsBtn = document.getElementById("searchStudentResultsBtn");
+const clearStudentSearchBtn = document.getElementById("clearStudentSearchBtn");
+const studentResultsBox = document.getElementById("studentResultsBox");
 
-const teacherScanStatus = document.getElementById("teacherScanStatus");
-const studentScanStatus = document.getElementById("studentScanStatus");
+teacherDashboardBtn.addEventListener("click", showTeacherDashboard);
+studentResultsBtn.addEventListener("click", showStudentConsultation);
 
-teacherModeBtn.addEventListener("click", showTeacherMode);
-studentModeBtn.addEventListener("click", showStudentMode);
+showCreateEvaluationBtn.addEventListener("click", showCreateEvaluation);
+showCorrectCopyBtn.addEventListener("click", showCorrectCopy);
+showClassResultsBtn.addEventListener("click", showClassResults);
+exportAllBtn.addEventListener("click", exportAllResults);
+resetAppBtn.addEventListener("click", resetApplication);
 
-backBtns.forEach((btn) => {
-  btn.addEventListener("click", showModeSelection);
+backHomeBtns.forEach((btn) => {
+  btn.addEventListener("click", showHome);
 });
 
-saveReferenceBtn.addEventListener("click", saveReference);
-showReferenceBtn.addEventListener("click", toggleReference);
-clearBtn.addEventListener("click", clearAll);
-correctBtn.addEventListener("click", correctDictation);
-hintBtn.addEventListener("click", showHint);
-printBtn.addEventListener("click", () => window.print());
-exportBtn.addEventListener("click", exportResult);
-startGameBtn.addEventListener("click", startGame);
+backDashboardBtns.forEach((btn) => {
+  btn.addEventListener("click", showTeacherDashboard);
+});
+
+saveEvaluationBtn.addEventListener("click", saveEvaluation);
+clearEvaluationFormBtn.addEventListener("click", clearEvaluationForm);
+
+evaluationSelect.addEventListener("change", showSelectedEvaluationInfo);
+
+correctAndSaveBtn.addEventListener("click", correctAndSaveCopy);
+clearCopyFormBtn.addEventListener("click", clearCopyForm);
 
 scanTeacherBtn.addEventListener("click", scanTeacherImage);
 scanStudentBtn.addEventListener("click", scanStudentImage);
 
-function showTeacherMode() {
-  modeSelection.style.display = "none";
+printSingleBtn.addEventListener("click", () => window.print());
 
-  teacherSection.classList.remove("hidden-section");
-  studentSection.classList.add("hidden-section");
-  resultSection.classList.add("hidden-section");
-  gameSection.classList.add("hidden-section");
+applyFiltersBtn.addEventListener("click", renderClassResults);
+clearFiltersBtn.addEventListener("click", clearFilters);
+
+searchStudentResultsBtn.addEventListener("click", searchStudentResults);
+clearStudentSearchBtn.addEventListener("click", clearStudentSearch);
+
+function loadEvaluations() {
+  const saved = localStorage.getItem("dicteeCoachEvaluations");
+
+  if (saved) {
+    evaluations = JSON.parse(saved);
+  } else {
+    evaluations = [];
+  }
 }
 
-function showStudentMode() {
-  modeSelection.style.display = "none";
-
-  teacherSection.classList.add("hidden-section");
-  studentSection.classList.remove("hidden-section");
-  resultSection.classList.remove("hidden-section");
-  gameSection.classList.remove("hidden-section");
+function saveEvaluationsToStorage() {
+  localStorage.setItem("dicteeCoachEvaluations", JSON.stringify(evaluations));
 }
 
-function showModeSelection() {
-  modeSelection.style.display = "block";
-
-  teacherSection.classList.add("hidden-section");
-  studentSection.classList.add("hidden-section");
-  resultSection.classList.add("hidden-section");
-  gameSection.classList.add("hidden-section");
+function generateId(prefix) {
+  return `${prefix}_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
 }
 
-function saveReference() {
-  referenceText = referenceInput.value.trim();
+function hideAllSections() {
+  homeSection.classList.add("hidden-section");
+  teacherDashboardSection.classList.add("hidden-section");
+  createEvaluationSection.classList.add("hidden-section");
+  correctCopySection.classList.add("hidden-section");
+  singleResultSection.classList.add("hidden-section");
+  classResultsSection.classList.add("hidden-section");
+  studentConsultationSection.classList.add("hidden-section");
+}
 
-  if (!referenceText) {
-    alert("Veuillez saisir le texte de référence.");
+function showHome() {
+  hideAllSections();
+  homeSection.classList.remove("hidden-section");
+}
+
+function showTeacherDashboard() {
+  hideAllSections();
+  teacherDashboardSection.classList.remove("hidden-section");
+}
+
+function showStudentConsultation() {
+  hideAllSections();
+  studentConsultationSection.classList.remove("hidden-section");
+}
+
+function showCreateEvaluation() {
+  hideAllSections();
+  createEvaluationSection.classList.remove("hidden-section");
+}
+
+function showCorrectCopy() {
+  hideAllSections();
+  correctCopySection.classList.remove("hidden-section");
+  singleResultSection.classList.remove("hidden-section");
+  populateEvaluationSelects();
+  showSelectedEvaluationInfo();
+}
+
+function showClassResults() {
+  hideAllSections();
+  classResultsSection.classList.remove("hidden-section");
+  populateEvaluationSelects();
+  renderClassResults();
+}
+
+function saveEvaluation() {
+  const title = evaluationTitle.value.trim();
+  const classe = evaluationClass.value.trim();
+  const date = evaluationDate.value;
+  const scale = Number(evaluationScale.value) || 20;
+  const text = referenceText.value.trim();
+
+  if (!title) {
+    alert("Veuillez renseigner le titre de la dictée.");
     return;
   }
 
-  localStorage.setItem("referenceText", referenceText);
-
-  referencePreview.textContent = referenceText;
-  referencePreview.classList.remove("hidden");
-
-  alert("Texte de référence enregistré avec succès !");
-}
-
-function toggleReference() {
-  const savedText = localStorage.getItem("referenceText") || referenceInput.value.trim();
-
-  if (!savedText) {
-    alert("Aucun texte de référence enregistré.");
+  if (!classe) {
+    alert("Veuillez renseigner la classe.");
     return;
   }
 
-  referencePreview.textContent = savedText;
-  referencePreview.classList.toggle("hidden");
-}
-
-function clearAll() {
-  if (!confirm("Voulez-vous vraiment réinitialiser toute l'application ?")) {
+  if (!date) {
+    alert("Veuillez renseigner la date de l’évaluation.");
     return;
   }
 
-  localStorage.removeItem("referenceText");
+  if (!text) {
+    alert("Veuillez saisir ou importer le texte original de la dictée.");
+    return;
+  }
 
-  referenceText = "";
-  lastErrors = [];
+  const evaluation = {
+    id: generateId("eval"),
+    title: title,
+    classe: classe,
+    date: date,
+    scale: scale,
+    referenceText: text,
+    copies: [],
+    createdAt: new Date().toISOString()
+  };
 
-  referenceInput.value = "";
-  studentInput.value = "";
-  studentNameInput.value = "";
+  evaluations.push(evaluation);
+  saveEvaluationsToStorage();
+  populateEvaluationSelects();
 
-  referencePreview.textContent = "";
-  referencePreview.classList.add("hidden");
+  alert("Évaluation enregistrée avec succès.");
 
-  hintBox.textContent = "";
-  hintBox.classList.add("hidden");
+  clearEvaluationForm();
+  showTeacherDashboard();
+}
 
+function clearEvaluationForm() {
+  evaluationTitle.value = "";
+  evaluationClass.value = "";
+  evaluationDate.value = "";
+  evaluationScale.value = 20;
+  referenceText.value = "";
   teacherImageInput.value = "";
-  studentImageInput.value = "";
-
   teacherScanStatus.textContent = "";
-  studentScanStatus.textContent = "";
-
   teacherScanStatus.className = "scan-status";
+}
+
+function populateEvaluationSelects() {
+  evaluationSelect.innerHTML = "";
+  filterEvaluation.innerHTML = '<option value="">Toutes les évaluations</option>';
+
+  if (evaluations.length === 0) {
+    evaluationSelect.innerHTML = '<option value="">Aucune évaluation disponible</option>';
+    return;
+  }
+
+  evaluations.forEach((evaluation) => {
+    const option = document.createElement("option");
+    option.value = evaluation.id;
+    option.textContent = `${formatDate(evaluation.date)} - ${evaluation.title} - ${evaluation.classe}`;
+    evaluationSelect.appendChild(option);
+
+    const filterOption = document.createElement("option");
+    filterOption.value = evaluation.id;
+    filterOption.textContent = `${formatDate(evaluation.date)} - ${evaluation.title} - ${evaluation.classe}`;
+    filterEvaluation.appendChild(filterOption);
+  });
+}
+
+function getSelectedEvaluation() {
+  const evaluationId = evaluationSelect.value;
+
+  if (!evaluationId) {
+    return null;
+  }
+
+  return evaluations.find((evaluation) => evaluation.id === evaluationId) || null;
+}
+
+function showSelectedEvaluationInfo() {
+  const evaluation = getSelectedEvaluation();
+
+  if (!evaluation) {
+    selectedEvaluationInfo.classList.add("hidden");
+    selectedEvaluationInfo.innerHTML = "";
+    return;
+  }
+
+  selectedEvaluationInfo.classList.remove("hidden");
+
+  selectedEvaluationInfo.innerHTML = `
+    <strong>Dictée :</strong> ${escapeHTML(evaluation.title)}<br>
+    <strong>Classe :</strong> ${escapeHTML(evaluation.classe)}<br>
+    <strong>Date :</strong> ${formatDate(evaluation.date)}<br>
+    <strong>Barème :</strong> /${evaluation.scale}<br>
+    <strong>Copies déjà corrigées :</strong> ${evaluation.copies.length}
+  `;
+
+  if (!studentClass.value.trim()) {
+    studentClass.value = evaluation.classe;
+  }
+}
+
+function clearCopyForm() {
+  studentFullName.value = "";
+  studentClass.value = "";
+  studentText.value = "";
+  studentImageInput.value = "";
+  studentScanStatus.textContent = "";
   studentScanStatus.className = "scan-status";
-
-  scoreValue.textContent = "0%";
-
-  document.querySelector(".score-circle").style.background =
-    "conic-gradient(#22c55e 0%, #e5e7eb 0%)";
-
-  feedbackTitle.textContent = "En attente de correction";
-  feedbackMessage.textContent =
-    "Saisissez un texte de référence et une dictée d’élève pour commencer.";
-
-  totalWords.textContent = "0";
-  correctWords.textContent = "0";
-  errorWords.textContent = "0";
-
-  correctionOutput.textContent = "La correction apparaîtra ici.";
-  errorList.innerHTML = "<li>Aucune correction effectuée.</li>";
-  gameBox.innerHTML = "<p>Aucun mot à retravailler pour le moment.</p>";
 }
 
-function normalizeText(text) {
-  return text
-    .trim()
-    .replace(/[’]/g, "'")
-    .replace(/[.,;:!?()"]/g, "")
-    .replace(/\s+/g, " ")
-    .toLowerCase();
-}
+function correctAndSaveCopy() {
+  const evaluation = getSelectedEvaluation();
 
-function splitWords(text) {
-  const cleanText = normalizeText(text);
-
-  if (!cleanText) {
-    return [];
-  }
-
-  return cleanText.split(" ");
-}
-
-function correctDictation() {
-  referenceText = localStorage.getItem("referenceText") || referenceInput.value.trim();
-
-  const studentText = studentInput.value.trim();
-  const studentName = studentNameInput.value.trim() || "Élève";
-
-  if (!referenceText) {
-    alert("Veuillez d’abord demander à l’enseignant d’enregistrer le texte de référence.");
+  if (!evaluation) {
+    alert("Veuillez sélectionner une évaluation.");
     return;
   }
 
-  if (!studentText) {
-    alert("Veuillez saisir le texte de l’élève ou importer une copie manuscrite.");
+  const name = studentFullName.value.trim();
+  const classe = studentClass.value.trim();
+  const text = studentText.value.trim();
+
+  if (!name) {
+    alert("Veuillez renseigner le nom et prénom de l’élève.");
     return;
   }
 
-  const referenceWords = splitWords(referenceText);
-  const studentWords = splitWords(studentText);
+  if (!classe) {
+    alert("Veuillez renseigner la classe de l’élève.");
+    return;
+  }
+
+  if (!text) {
+    alert("Veuillez saisir ou importer le texte de la copie élève.");
+    return;
+  }
+
+  const correction = compareTexts(evaluation.referenceText, text);
+  const note = Math.round((correction.score / 100) * evaluation.scale * 100) / 100;
+  const appreciation = getAppreciation(correction.score, name);
+
+  const copyResult = {
+    id: generateId("copy"),
+    studentName: name,
+    studentClass: classe,
+    studentText: text,
+    score: correction.score,
+    note: note,
+    scale: evaluation.scale,
+    correctWords: correction.correctCount,
+    totalWords: correction.totalWords,
+    errorCount: correction.errors.length,
+    errors: correction.errors,
+    correctionHTML: correction.outputHTML,
+    appreciation: appreciation.message,
+    correctedAt: new Date().toISOString()
+  };
+
+  evaluation.copies.push(copyResult);
+  saveEvaluationsToStorage();
+
+  lastCorrection = {
+    evaluation: evaluation,
+    result: copyResult
+  };
+
+  renderSingleResult(evaluation, copyResult);
+  renderClassResults();
+  populateEvaluationSelects();
+  showSelectedEvaluationInfo();
+
+  alert("Copie corrigée et résultat enregistré avec succès.");
+
+  clearCopyForm();
+}
+
+function compareTexts(reference, student) {
+  const referenceWords = splitWords(reference);
+  const studentWords = splitWords(student);
 
   let correctCount = 0;
   let errors = [];
@@ -216,7 +378,6 @@ function correctDictation() {
 
     if (expected && given && expected === given) {
       correctCount++;
-
       outputHTML += `<span class="word-correct">${escapeHTML(given)}</span> `;
     } else if (expected && given && expected !== given) {
       errors.push({
@@ -249,218 +410,254 @@ function correctDictation() {
     }
   }
 
-  lastErrors = errors;
-
   const score = referenceWords.length
     ? Math.round((correctCount / referenceWords.length) * 100)
     : 0;
 
-  updateScore(score, correctCount, errors.length, referenceWords.length);
-  updateFeedback(score, studentName);
-  updateCorrectionOutput(outputHTML);
-  updateErrorList(errors);
+  return {
+    score: score,
+    correctCount: correctCount,
+    totalWords: referenceWords.length,
+    errors: errors,
+    outputHTML: outputHTML
+  };
 }
 
-function updateScore(score, correctCount, errorCount, total) {
-  scoreValue.textContent = `${score}%`;
+function renderSingleResult(evaluation, result) {
+  singleResultSection.classList.remove("hidden-section");
+
+  scoreValue.textContent = `${result.score}%`;
 
   const circle = document.querySelector(".score-circle");
 
   circle.style.background =
-    `conic-gradient(#22c55e ${score}%, #e5e7eb ${score}%)`;
+    `conic-gradient(#22c55e ${result.score}%, #e5e7eb ${result.score}%)`;
 
-  totalWords.textContent = total;
-  correctWords.textContent = correctCount;
-  errorWords.textContent = errorCount;
-}
+  feedbackTitle.textContent = `${result.studentName} — ${evaluation.title}`;
 
-function updateFeedback(score, studentName) {
-  if (score >= 90) {
-    feedbackTitle.textContent = `Excellent travail, ${studentName} !`;
-    feedbackMessage.textContent =
-      "La dictée est très bien réussie. Quelques détails peuvent encore être vérifiés.";
-  } else if (score >= 70) {
-    feedbackTitle.textContent = `Bon travail, ${studentName} !`;
-    feedbackMessage.textContent =
-      "La dictée est globalement maîtrisée. Il faut reprendre les mots signalés pour progresser.";
-  } else if (score >= 50) {
-    feedbackTitle.textContent = `Courage, ${studentName} !`;
-    feedbackMessage.textContent =
-      "Il y a des acquis, mais plusieurs erreurs doivent être retravaillées avec l’enseignant.";
+  feedbackMessage.innerHTML = `
+    <strong>Date :</strong> ${formatDate(evaluation.date)} |
+    <strong>Classe :</strong> ${escapeHTML(result.studentClass)} |
+    <strong>Note :</strong> ${result.note}/${result.scale}<br>
+    ${escapeHTML(result.appreciation)}
+  `;
+
+  totalWords.textContent = result.totalWords;
+  correctWords.textContent = result.correctWords;
+  errorWords.textContent = result.errorCount;
+
+  correctionOutput.innerHTML = result.correctionHTML || "Aucune correction disponible.";
+
+  if (result.errors.length === 0) {
+    errorList.innerHTML = "<li>Bravo ! Aucune erreur repérée.</li>";
   } else {
-    feedbackTitle.textContent = `On reprend ensemble, ${studentName}.`;
-    feedbackMessage.textContent =
-      "La dictée doit être retravaillée pas à pas. Le mini-jeu peut aider à revoir les mots difficiles.";
+    errorList.innerHTML = "";
+
+    result.errors.forEach((error) => {
+      const li = document.createElement("li");
+
+      li.innerHTML = `
+        Position ${error.position} :
+        tu as écrit <strong>${escapeHTML(error.given)}</strong>,
+        il fallait écrire <strong>${escapeHTML(error.expected)}</strong>.
+        <em>Type probable : ${escapeHTML(error.type)}</em>.
+      `;
+
+      errorList.appendChild(li);
+    });
   }
 }
 
-function updateCorrectionOutput(html) {
-  correctionOutput.innerHTML = html || "Aucune correction disponible.";
-}
+function renderClassResults() {
+  const selectedEval = filterEvaluation.value;
+  const selectedClass = normalizeForSearch(filterClass.value);
+  const selectedStudent = normalizeForSearch(filterStudent.value);
 
-function updateErrorList(errors) {
-  if (errors.length === 0) {
-    errorList.innerHTML = "<li>Bravo ! Aucune erreur repérée.</li>";
+  const rows = [];
+
+  evaluations.forEach((evaluation) => {
+    if (selectedEval && evaluation.id !== selectedEval) {
+      return;
+    }
+
+    evaluation.copies.forEach((copy) => {
+      const classMatch = !selectedClass || normalizeForSearch(copy.studentClass).includes(selectedClass);
+      const studentMatch = !selectedStudent || normalizeForSearch(copy.studentName).includes(selectedStudent);
+
+      if (classMatch && studentMatch) {
+        rows.push({
+          evaluation: evaluation,
+          copy: copy
+        });
+      }
+    });
+  });
+
+  if (rows.length === 0) {
+    classResultsBody.innerHTML = `
+      <tr>
+        <td colspan="8">Aucun résultat trouvé.</td>
+      </tr>
+    `;
     return;
   }
 
-  errorList.innerHTML = "";
+  classResultsBody.innerHTML = "";
 
-  errors.forEach((error) => {
-    const li = document.createElement("li");
+  rows.forEach((item) => {
+    const tr = document.createElement("tr");
 
-    li.innerHTML = `
-      Position ${error.position} :
-      tu as écrit <strong>${escapeHTML(error.given)}</strong>,
-      il fallait écrire <strong>${escapeHTML(error.expected)}</strong>.
-      <em>Type probable : ${escapeHTML(error.type)}</em>.
+    tr.innerHTML = `
+      <td>${formatDate(item.evaluation.date)}</td>
+      <td>${escapeHTML(item.evaluation.title)}</td>
+      <td>${escapeHTML(item.copy.studentClass)}</td>
+      <td>${escapeHTML(item.copy.studentName)}</td>
+      <td class="${getScoreClass(item.copy.score)}">${item.copy.score}%</td>
+      <td>${item.copy.note}/${item.copy.scale}</td>
+      <td>${item.copy.errorCount}</td>
+      <td>${escapeHTML(item.copy.appreciation)}</td>
     `;
 
-    errorList.appendChild(li);
+    classResultsBody.appendChild(tr);
   });
 }
 
-function detectErrorType(expected, given) {
-  if (expected.length === given.length) {
-    return "Erreur d’orthographe possible";
-  }
-
-  if (expected.startsWith(given) || given.startsWith(expected)) {
-    return "Mot incomplet ou accord oublié";
-  }
-
-  if (Math.abs(expected.length - given.length) <= 2) {
-    return "Erreur proche du mot attendu";
-  }
-
-  return "Mot différent";
+function clearFilters() {
+  filterEvaluation.value = "";
+  filterClass.value = "";
+  filterStudent.value = "";
+  renderClassResults();
 }
 
-function showHint() {
-  referenceText = localStorage.getItem("referenceText") || referenceInput.value.trim();
+function searchStudentResults() {
+  const name = normalizeForSearch(searchStudentName.value);
+  const classe = normalizeForSearch(searchStudentClass.value);
+  const date = searchEvaluationDate.value;
 
-  if (!referenceText) {
-    alert("Aucun texte de référence n’a encore été enregistré.");
+  if (!name) {
+    alert("Veuillez renseigner votre nom.");
     return;
   }
 
-  const words = splitWords(referenceText);
-
-  if (words.length === 0) {
+  if (!classe) {
+    alert("Veuillez renseigner votre classe.");
     return;
   }
 
-  const randomWord = words[Math.floor(Math.random() * words.length)];
+  const results = [];
 
-  hintBox.innerHTML = `
-    <strong>Indice :</strong> un mot important de la dictée commence par
-    <strong>${randomWord.charAt(0).toUpperCase()}</strong>
-    et contient <strong>${randomWord.length}</strong> lettres.
-  `;
+  evaluations.forEach((evaluation) => {
+    if (date && evaluation.date !== date) {
+      return;
+    }
 
-  hintBox.classList.remove("hidden");
-}
+    evaluation.copies.forEach((copy) => {
+      const nameMatch = normalizeForSearch(copy.studentName).includes(name);
+      const classMatch = normalizeForSearch(copy.studentClass) === classe;
 
-function startGame() {
-  if (!lastErrors || lastErrors.length === 0) {
-    gameBox.innerHTML = "<p class='success'>Aucun mot à retravailler. Bravo !</p>";
-    return;
-  }
+      if (nameMatch && classMatch) {
+        results.push({
+          evaluation: evaluation,
+          copy: copy
+        });
+      }
+    });
+  });
 
-  const randomError = lastErrors[Math.floor(Math.random() * lastErrors.length)];
-
-  gameBox.innerHTML = `
-    <p class="game-question">
-      Réécris correctement ce mot :
-      <span class="word-error">${escapeHTML(randomError.given)}</span>
-    </p>
-
-    <input
-      type="text"
-      id="gameAnswer"
-      class="game-input"
-      placeholder="Écris la bonne réponse..."
-    />
-
-    <div class="actions">
-      <button onclick="checkGameAnswer('${escapeForAttribute(randomError.expected)}')">
-        Vérifier
-      </button>
-    </div>
-
-    <p id="gameFeedback"></p>
-  `;
-}
-
-function checkGameAnswer(expected) {
-  const answerInput = document.getElementById("gameAnswer");
-  const gameFeedback = document.getElementById("gameFeedback");
-
-  const answer = normalizeText(answerInput.value);
-  const expectedNormalized = normalizeText(expected);
-
-  if (!answer) {
-    gameFeedback.innerHTML = "<span class='fail'>Écris d’abord une réponse.</span>";
-    return;
-  }
-
-  if (answer === expectedNormalized) {
-    gameFeedback.innerHTML =
-      "<span class='success'>Bravo ! Le mot est bien corrigé.</span>";
-  } else {
-    gameFeedback.innerHTML = `
-      <span class='fail'>
-        Ce n’est pas encore juste. La bonne réponse est : ${escapeHTML(expected)}
-      </span>
+  if (results.length === 0) {
+    studentResultsBox.innerHTML = `
+      <p>Aucun résultat trouvé pour ces informations.</p>
+      <p>Vérifiez l’orthographe de votre nom, votre classe ou la date saisie.</p>
     `;
+    return;
   }
+
+  studentResultsBox.innerHTML = "";
+
+  results.forEach((item) => {
+    const div = document.createElement("div");
+    div.className = "result-card-student";
+
+    div.innerHTML = `
+      <h3>${escapeHTML(item.evaluation.title)}</h3>
+      <p><strong>Date :</strong> ${formatDate(item.evaluation.date)}</p>
+      <p><strong>Classe :</strong> ${escapeHTML(item.copy.studentClass)}</p>
+      <p><strong>Score :</strong> <span class="${getScoreClass(item.copy.score)}">${item.copy.score}%</span></p>
+      <p><strong>Note :</strong> ${item.copy.note}/${item.copy.scale}</p>
+      <p><strong>Nombre d’erreurs :</strong> ${item.copy.errorCount}</p>
+      <p><strong>Appréciation :</strong> ${escapeHTML(item.copy.appreciation)}</p>
+    `;
+
+    studentResultsBox.appendChild(div);
+  });
 }
 
-function exportResult() {
-  const studentName = studentNameInput.value.trim() || "Élève";
-  const score = scoreValue.textContent;
-  const feedback = feedbackMessage.textContent;
+function clearStudentSearch() {
+  searchStudentName.value = "";
+  searchStudentClass.value = "";
+  searchEvaluationDate.value = "";
+  studentResultsBox.innerHTML = "Aucun résultat recherché pour le moment.";
+}
 
-  let errorsText = "";
+function exportAllResults() {
+  const lines = [];
 
-  if (lastErrors.length === 0) {
-    errorsText = "Aucune erreur repérée.";
-  } else {
-    errorsText = lastErrors
-      .map((error) => {
-        return `Position ${error.position} : "${error.given}" → "${error.expected}" (${error.type})`;
-      })
-      .join("\n");
+  lines.push("Date;Dictée;Classe;Élève;Score;Note;Barème;Erreurs;Appréciation");
+
+  evaluations.forEach((evaluation) => {
+    evaluation.copies.forEach((copy) => {
+      lines.push([
+        evaluation.date,
+        evaluation.title,
+        copy.studentClass,
+        copy.studentName,
+        `${copy.score}%`,
+        copy.note,
+        copy.scale,
+        copy.errorCount,
+        copy.appreciation
+      ].map(escapeCSV).join(";"));
+    });
+  });
+
+  if (lines.length === 1) {
+    alert("Aucun résultat à exporter.");
+    return;
   }
 
-  const content = `
-Résultat de dictée - Dictée Coach IA
-
-Élève : ${studentName}
-Score : ${score}
-
-Commentaire :
-${feedback}
-
-Erreurs :
-${errorsText}
-
-Note :
-Cette correction est une aide automatique. La validation finale revient à l’enseignant.
-`;
+  const content = lines.join("\n");
 
   const blob = new Blob([content], {
-    type: "text/plain;charset=utf-8"
+    type: "text/csv;charset=utf-8"
   });
 
   const url = URL.createObjectURL(blob);
 
   const link = document.createElement("a");
   link.href = url;
-  link.download = `correction_dictee_${studentName.replace(/\s+/g, "_")}.txt`;
+  link.download = "resultats_dictee_coach_ia.csv";
   link.click();
 
   URL.revokeObjectURL(url);
+}
+
+function resetApplication() {
+  if (!confirm("Voulez-vous vraiment supprimer toutes les évaluations et tous les résultats ?")) {
+    return;
+  }
+
+  localStorage.removeItem("dicteeCoachEvaluations");
+  evaluations = [];
+  lastCorrection = null;
+
+  populateEvaluationSelects();
+  renderClassResults();
+  clearEvaluationForm();
+  clearCopyForm();
+  clearStudentSearch();
+
+  alert("Application réinitialisée.");
+  showHome();
 }
 
 async function scanTeacherImage() {
@@ -476,18 +673,12 @@ async function scanTeacherImage() {
 
   try {
     const extractedText = await extractTextFromImage(file, teacherScanStatus);
+    referenceText.value = cleanOCRText(extractedText);
 
-    referenceInput.value = cleanOCRText(extractedText);
-    referenceText = referenceInput.value.trim();
-
-    if (referenceText) {
-      localStorage.setItem("referenceText", referenceText);
-      referencePreview.textContent = referenceText;
-      referencePreview.classList.remove("hidden");
-
+    if (referenceText.value.trim()) {
       setScanStatus(
         teacherScanStatus,
-        "Texte extrait avec succès. Vérifiez-le avant d’enregistrer définitivement.",
+        "Texte extrait avec succès. Vérifiez-le avant d’enregistrer l’évaluation.",
         "success-status"
       );
     } else {
@@ -523,10 +714,9 @@ async function scanStudentImage() {
 
   try {
     const extractedText = await extractTextFromImage(file, studentScanStatus);
+    studentText.value = cleanOCRText(extractedText);
 
-    studentInput.value = cleanOCRText(extractedText);
-
-    if (studentInput.value.trim()) {
+    if (studentText.value.trim()) {
       setScanStatus(
         studentScanStatus,
         "Texte extrait avec succès. Vérifiez-le avant de lancer la correction.",
@@ -566,6 +756,7 @@ async function extractTextFromImage(file, statusElement) {
       logger: function (message) {
         if (message.status === "recognizing text") {
           const progress = Math.round(message.progress * 100);
+
           setScanStatus(
             statusElement,
             `Reconnaissance du texte : ${progress}%`,
@@ -595,6 +786,107 @@ function cleanOCRText(text) {
     .trim();
 }
 
+function normalizeText(text) {
+  return text
+    .trim()
+    .replace(/[’]/g, "'")
+    .replace(/[.,;:!?()"]/g, "")
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+}
+
+function splitWords(text) {
+  const cleanText = normalizeText(text);
+
+  if (!cleanText) {
+    return [];
+  }
+
+  return cleanText.split(" ");
+}
+
+function detectErrorType(expected, given) {
+  if (given === "mot manquant") {
+    return "Mot oublié";
+  }
+
+  if (expected.length === given.length) {
+    return "Erreur d’orthographe possible";
+  }
+
+  if (expected.startsWith(given) || given.startsWith(expected)) {
+    return "Mot incomplet ou accord oublié";
+  }
+
+  if (Math.abs(expected.length - given.length) <= 2) {
+    return "Erreur proche du mot attendu";
+  }
+
+  return "Mot différent";
+}
+
+function getAppreciation(score, name) {
+  if (score >= 90) {
+    return {
+      title: `Excellent travail, ${name} !`,
+      message: "Excellent travail. La dictée est très bien maîtrisée."
+    };
+  }
+
+  if (score >= 70) {
+    return {
+      title: `Bon travail, ${name} !`,
+      message: "Bon travail. Les acquis sont présents, mais quelques erreurs doivent être reprises."
+    };
+  }
+
+  if (score >= 50) {
+    return {
+      title: `Courage, ${name} !`,
+      message: "Résultat moyen. Il faut renforcer l’orthographe, les accords et la relecture."
+    };
+  }
+
+  return {
+    title: `À reprendre avec accompagnement, ${name}.`,
+    message: "Des difficultés importantes sont observées. Une remédiation est nécessaire."
+  };
+}
+
+function getScoreClass(score) {
+  if (score >= 70) {
+    return "score-good";
+  }
+
+  if (score >= 50) {
+    return "score-medium";
+  }
+
+  return "score-low";
+}
+
+function normalizeForSearch(text) {
+  return String(text)
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function formatDate(dateString) {
+  if (!dateString) {
+    return "";
+  }
+
+  const parts = dateString.split("-");
+
+  if (parts.length !== 3) {
+    return dateString;
+  }
+
+  return `${parts[2]}/${parts[1]}/${parts[0]}`;
+}
+
 function setScanStatus(element, message, className) {
   element.textContent = message;
   element.className = "scan-status";
@@ -613,21 +905,17 @@ function escapeHTML(value) {
     .replaceAll("'", "&#039;");
 }
 
-function escapeForAttribute(value) {
-  return String(value)
-    .replaceAll("\\", "\\\\")
-    .replaceAll("'", "\\'")
-    .replaceAll('"', "&quot;");
+function escapeCSV(value) {
+  const stringValue = String(value ?? "");
+  return `"${stringValue.replaceAll('"', '""')}"`;
 }
 
 window.addEventListener("load", () => {
-  const savedReference = localStorage.getItem("referenceText");
+  loadEvaluations();
+  populateEvaluationSelects();
 
-  if (savedReference) {
-    referenceText = savedReference;
-    referenceInput.value = savedReference;
-    referencePreview.textContent = savedReference;
-  }
+  const today = new Date().toISOString().split("T")[0];
+  evaluationDate.value = today;
 
-  showModeSelection();
+  showHome();
 });
