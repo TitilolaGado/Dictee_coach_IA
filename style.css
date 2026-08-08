@@ -89,6 +89,10 @@ body {
   display: none;
 }
 
+.hidden {
+  display: none;
+}
+
 h2 {
   margin-top: 0;
   color: #1e3a8a;
@@ -102,6 +106,18 @@ h3 {
 .hint {
   color: #64748b;
   font-size: 15px;
+  line-height: 1.6;
+}
+
+.warning-text {
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #fff7ed;
+  border-left: 5px solid #f97316;
+  color: #9a3412;
+  line-height: 1.6;
+  font-size: 14px;
 }
 
 label {
@@ -132,6 +148,10 @@ input:focus {
   background: white;
 }
 
+input[type="file"] {
+  cursor: pointer;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -153,6 +173,12 @@ button {
 button:hover {
   transform: translateY(-2px);
   background: #1d4ed8;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 button.secondary {
@@ -180,10 +206,42 @@ button.danger:hover {
   background: #eff6ff;
   border-left: 5px solid #2563eb;
   line-height: 1.6;
+  white-space: pre-wrap;
 }
 
-.hidden {
-  display: none;
+.scan-zone {
+  margin-top: 18px;
+  padding: 16px;
+  background: #f8fafc;
+  border: 1px dashed #94a3b8;
+  border-radius: 14px;
+}
+
+.scan-zone h3 {
+  margin-top: 0;
+  color: #1e3a8a;
+}
+
+.scan-zone input[type="file"] {
+  background: white;
+  margin-bottom: 12px;
+}
+
+.scan-status {
+  margin-top: 10px;
+  color: #475569;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.scan-status.success-status {
+  color: #15803d;
+  font-weight: bold;
+}
+
+.scan-status.error-status {
+  color: #b91c1c;
+  font-weight: bold;
 }
 
 .score-zone {
@@ -328,6 +386,27 @@ footer {
   padding: 20px;
   color: #64748b;
   font-size: 14px;
+}
+
+@media print {
+  .app-header,
+  .mode-selection,
+  .teacher-card,
+  .student-card,
+  .game-card,
+  footer,
+  .actions {
+    display: none !important;
+  }
+
+  .result-card {
+    display: block !important;
+    box-shadow: none;
+  }
+
+  body {
+    background: white;
+  }
 }
 
 @media (max-width: 800px) {

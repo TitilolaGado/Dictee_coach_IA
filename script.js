@@ -36,6 +36,15 @@ const correctionOutput = document.getElementById("correctionOutput");
 const errorList = document.getElementById("errorList");
 const gameBox = document.getElementById("gameBox");
 
+const teacherImageInput = document.getElementById("teacherImageInput");
+const studentImageInput = document.getElementById("studentImageInput");
+
+const scanTeacherBtn = document.getElementById("scanTeacherBtn");
+const scanStudentBtn = document.getElementById("scanStudentBtn");
+
+const teacherScanStatus = document.getElementById("teacherScanStatus");
+const studentScanStatus = document.getElementById("studentScanStatus");
+
 teacherModeBtn.addEventListener("click", showTeacherMode);
 studentModeBtn.addEventListener("click", showStudentMode);
 
@@ -51,6 +60,9 @@ hintBtn.addEventListener("click", showHint);
 printBtn.addEventListener("click", () => window.print());
 exportBtn.addEventListener("click", exportResult);
 startGameBtn.addEventListener("click", startGame);
+
+scanTeacherBtn.addEventListener("click", scanTeacherImage);
+scanStudentBtn.addEventListener("click", scanStudentImage);
 
 function showTeacherMode() {
   modeSelection.style.display = "none";
@@ -127,6 +139,15 @@ function clearAll() {
   hintBox.textContent = "";
   hintBox.classList.add("hidden");
 
+  teacherImageInput.value = "";
+  studentImageInput.value = "";
+
+  teacherScanStatus.textContent = "";
+  studentScanStatus.textContent = "";
+
+  teacherScanStatus.className = "scan-status";
+  studentScanStatus.className = "scan-status";
+
   scoreValue.textContent = "0%";
 
   document.querySelector(".score-circle").style.background =
@@ -176,7 +197,7 @@ function correctDictation() {
   }
 
   if (!studentText) {
-    alert("Veuillez saisir le texte de l’élève.");
+    alert("Veuillez saisir le texte de l’élève ou importer une copie manuscrite.");
     return;
   }
 
@@ -354,7 +375,12 @@ function startGame() {
       <span class="word-error">${escapeHTML(randomError.given)}</span>
     </p>
 
-    <input type="text" id="gameAnswer" class="game-input" placeholder="Écris la bonne réponse..." />
+    <input
+      type="text"
+      id="gameAnswer"
+      class="game-input"
+      placeholder="Écris la bonne réponse..."
+    />
 
     <div class="actions">
       <button onclick="checkGameAnswer('${escapeForAttribute(randomError.expected)}')">
@@ -421,7 +447,7 @@ ${errorsText}
 
 Note :
 Cette correction est une aide automatique. La validation finale revient à l’enseignant.
-  `;
+`;
 
   const blob = new Blob([content], {
     type: "text/plain;charset=utf-8"
@@ -435,6 +461,147 @@ Cette correction est une aide automatique. La validation finale revient à l’e
   link.click();
 
   URL.revokeObjectURL(url);
+}
+
+async function scanTeacherImage() {
+  const file = teacherImageInput.files[0];
+
+  if (!file) {
+    alert("Veuillez d’abord choisir ou prendre une photo du modèle de dictée.");
+    return;
+  }
+
+  setScanStatus(teacherScanStatus, "Lecture de l’image en cours... Veuillez patienter.", "");
+  scanTeacherBtn.disabled = true;
+
+  try {
+    const extractedText = await extractTextFromImage(file, teacherScanStatus);
+
+    referenceInput.value = cleanOCRText(extractedText);
+    referenceText = referenceInput.value.trim();
+
+    if (referenceText) {
+      localStorage.setItem("referenceText", referenceText);
+      referencePreview.textContent = referenceText;
+      referencePreview.classList.remove("hidden");
+
+      setScanStatus(
+        teacherScanStatus,
+        "Texte extrait avec succès. Vérifiez-le avant d’enregistrer définitivement.",
+        "success-status"
+      );
+    } else {
+      setScanStatus(
+        teacherScanStatus,
+        "Aucun texte n’a été reconnu. Veuillez reprendre la photo plus clairement.",
+        "error-status"
+      );
+    }
+  } catch (error) {
+    console.error(error);
+
+    setScanStatus(
+      teacherScanStatus,
+      "Erreur lors de la lecture de l’image. Essayez avec une photo plus nette.",
+      "error-status"
+    );
+  } finally {
+    scanTeacherBtn.disabled = false;
+  }
+}
+
+async function scanStudentImage() {
+  const file = studentImageInput.files[0];
+
+  if (!file) {
+    alert("Veuillez d’abord choisir ou prendre une photo de la copie manuscrite.");
+    return;
+  }
+
+  setScanStatus(studentScanStatus, "Lecture de la copie en cours... Veuillez patienter.", "");
+  scanStudentBtn.disabled = true;
+
+  try {
+    const extractedText = await extractTextFromImage(file, studentScanStatus);
+
+    studentInput.value = cleanOCRText(extractedText);
+
+    if (studentInput.value.trim()) {
+      setScanStatus(
+        studentScanStatus,
+        "Texte extrait avec succès. Vérifiez-le avant de lancer la correction.",
+        "success-status"
+      );
+    } else {
+      setScanStatus(
+        studentScanStatus,
+        "Aucun texte n’a été reconnu. Veuillez reprendre la photo plus clairement.",
+        "error-status"
+      );
+    }
+  } catch (error) {
+    console.error(error);
+
+    setScanStatus(
+      studentScanStatus,
+      "Erreur lors de la lecture de la copie. Essayez avec une photo plus nette.",
+      "error-status"
+    );
+  } finally {
+    scanStudentBtn.disabled = false;
+  }
+}
+
+async function extractTextFromImage(file, statusElement) {
+  if (typeof Tesseract === "undefined") {
+    throw new Error("Tesseract.js n’est pas chargé.");
+  }
+
+  const imageURL = URL.createObjectURL(file);
+
+  const result = await Tesseract.recognize(
+    imageURL,
+    "fra",
+    {
+      logger: function (message) {
+        if (message.status === "recognizing text") {
+          const progress = Math.round(message.progress * 100);
+          setScanStatus(
+            statusElement,
+            `Reconnaissance du texte : ${progress}%`,
+            ""
+          );
+        } else if (message.status) {
+          setScanStatus(
+            statusElement,
+            `Préparation : ${message.status}`,
+            ""
+          );
+        }
+      }
+    }
+  );
+
+  URL.revokeObjectURL(imageURL);
+
+  return result.data.text;
+}
+
+function cleanOCRText(text) {
+  return text
+    .replace(/\n+/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/[|]/g, "I")
+    .trim();
+}
+
+function setScanStatus(element, message, className) {
+  element.textContent = message;
+  element.className = "scan-status";
+
+  if (className) {
+    element.classList.add(className);
+  }
 }
 
 function escapeHTML(value) {

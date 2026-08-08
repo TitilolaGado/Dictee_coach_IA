@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Dictée Coach IA</title>
+
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
 
   <header class="app-header">
@@ -13,6 +16,7 @@
       <h1>Dictée Coach IA</h1>
       <p>Application ludique d’aide à la correction des dictées</p>
     </div>
+
     <span class="badge">Mode classe</span>
   </header>
 
@@ -28,14 +32,49 @@
 
   <main class="container">
 
+    <!-- ESPACE ENSEIGNANT -->
     <section class="card teacher-card hidden-section" id="teacherSection">
       <h2>1. Espace enseignant</h2>
+
       <p class="hint">
-        Saisissez ici le texte correct de la dictée. Il servira de référence pour la correction.
+        Saisissez ici le texte correct de la dictée ou importez-le à partir d’une photo ou d’un scan.
+        Ce texte servira de référence pour la correction.
       </p>
 
       <label for="referenceText">Texte de référence</label>
-      <textarea id="referenceText" placeholder="Exemple : Le petit garçon marche dans la cour de l'école."></textarea>
+      <textarea
+        id="referenceText"
+        placeholder="Exemple : Aujourd’hui, les élèves découvrent de nouveaux outils numériques en classe."
+      ></textarea>
+
+      <div class="scan-zone">
+        <h3>Importer le modèle par photo ou scan</h3>
+
+        <p class="hint">
+          Vous pouvez prendre en photo le modèle manuscrit ou importer une image déjà scannée.
+          Le texte reconnu apparaîtra dans la zone ci-dessus.
+        </p>
+
+        <input
+          type="file"
+          id="teacherImageInput"
+          accept="image/*"
+          capture="environment"
+        />
+
+        <div class="actions">
+          <button id="scanTeacherBtn" class="secondary">
+            Lire l’image du modèle
+          </button>
+        </div>
+
+        <p id="teacherScanStatus" class="scan-status"></p>
+      </div>
+
+      <p class="warning-text">
+        Attention : la lecture automatique peut contenir des erreurs. L’enseignant doit toujours vérifier
+        le texte extrait avant de l’enregistrer comme référence.
+      </p>
 
       <div class="actions">
         <button id="saveReferenceBtn">Enregistrer la dictée</button>
@@ -47,17 +86,55 @@
       <div id="referencePreview" class="preview hidden"></div>
     </section>
 
+    <!-- ESPACE ÉLÈVE -->
     <section class="card student-card hidden-section" id="studentSection">
       <h2>2. Espace élève</h2>
+
       <p class="hint">
-        L’élève saisit sa dictée ici. L’enseignant peut ensuite lancer la correction.
+        L’élève peut saisir sa dictée directement ou importer une photo de sa copie manuscrite.
       </p>
 
       <label for="studentName">Nom de l’élève</label>
-      <input type="text" id="studentName" placeholder="Exemple : Aïcha" />
+      <input
+        type="text"
+        id="studentName"
+        placeholder="Exemple : Aïcha"
+      />
 
       <label for="studentText">Texte de l’élève</label>
-      <textarea id="studentText" placeholder="Écris ici ta dictée..."></textarea>
+      <textarea
+        id="studentText"
+        placeholder="Écris ici ta dictée ou importe une photo de ta copie..."
+      ></textarea>
+
+      <div class="scan-zone">
+        <h3>Importer la copie manuscrite par photo ou scan</h3>
+
+        <p class="hint">
+          Prends une photo nette de ta copie. Le texte reconnu sera placé dans la zone ci-dessus.
+          Il faut le relire avant de lancer la correction.
+        </p>
+
+        <input
+          type="file"
+          id="studentImageInput"
+          accept="image/*"
+          capture="environment"
+        />
+
+        <div class="actions">
+          <button id="scanStudentBtn" class="secondary">
+            Lire l’image de ma copie
+          </button>
+        </div>
+
+        <p id="studentScanStatus" class="scan-status"></p>
+      </div>
+
+      <p class="warning-text">
+        Attention : si l’écriture est peu lisible, certains mots peuvent être mal reconnus.
+        Relis le texte extrait avant de corriger.
+      </p>
 
       <div class="actions">
         <button id="correctBtn">Corriger ma dictée</button>
@@ -68,6 +145,7 @@
       <div id="hintBox" class="hint-box hidden"></div>
     </section>
 
+    <!-- RÉSULTAT -->
     <section class="card result-card hidden-section" id="resultSection">
       <h2>3. Résultat de la correction</h2>
 
@@ -102,11 +180,13 @@
       </div>
 
       <h3>Correction interactive</h3>
+
       <div id="correctionOutput" class="correction-output">
         La correction apparaîtra ici.
       </div>
 
       <h3>Liste des erreurs</h3>
+
       <ul id="errorList" class="error-list">
         <li>Aucune correction effectuée.</li>
       </ul>
@@ -117,10 +197,12 @@
       </div>
     </section>
 
+    <!-- MINI-JEU -->
     <section class="card game-card hidden-section" id="gameSection">
       <h2>4. Mini-jeu de remédiation</h2>
+
       <p class="hint">
-        Après la correction, l’élève peut refaire les mots mal écrits.
+        Après la correction, l’élève peut reprendre les mots mal écrits pour progresser.
       </p>
 
       <div id="gameBox" class="game-box">
@@ -140,6 +222,10 @@
     </p>
   </footer>
 
+  <!-- Bibliothèque OCR -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+  <!-- Code principal -->
   <script src="script.js"></script>
 </body>
 </html>
