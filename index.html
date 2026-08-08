@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dictée Coach IA</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="app-header">
+    <div>
+      <h1>Dictée Coach IA</h1>
+      <p>Application ludique d’aide à la correction des dictées</p>
+    </div>
+    <span class="badge">Mode classe</span>
+  </header>
+
+  <section class="mode-selection" id="modeSelection">
+    <h2>Choisissez votre espace</h2>
+    <p>Sélectionnez le mode d’utilisation de l’application.</p>
+
+    <div class="mode-buttons">
+      <button id="teacherModeBtn">Espace enseignant</button>
+      <button id="studentModeBtn">Espace élève</button>
+    </div>
+  </section>
+
+  <main class="container">
+
+    <section class="card teacher-card hidden-section" id="teacherSection">
+      <h2>1. Espace enseignant</h2>
+      <p class="hint">
+        Saisissez ici le texte correct de la dictée. Il servira de référence pour la correction.
+      </p>
+
+      <label for="referenceText">Texte de référence</label>
+      <textarea id="referenceText" placeholder="Exemple : Le petit garçon marche dans la cour de l'école."></textarea>
+
+      <div class="actions">
+        <button id="saveReferenceBtn">Enregistrer la dictée</button>
+        <button id="showReferenceBtn" class="secondary">Afficher / cacher</button>
+        <button id="clearBtn" class="danger">Réinitialiser</button>
+        <button class="secondary backBtn">Retour au choix</button>
+      </div>
+
+      <div id="referencePreview" class="preview hidden"></div>
+    </section>
+
+    <section class="card student-card hidden-section" id="studentSection">
+      <h2>2. Espace élève</h2>
+      <p class="hint">
+        L’élève saisit sa dictée ici. L’enseignant peut ensuite lancer la correction.
+      </p>
+
+      <label for="studentName">Nom de l’élève</label>
+      <input type="text" id="studentName" placeholder="Exemple : Aïcha" />
+
+      <label for="studentText">Texte de l’élève</label>
+      <textarea id="studentText" placeholder="Écris ici ta dictée..."></textarea>
+
+      <div class="actions">
+        <button id="correctBtn">Corriger ma dictée</button>
+        <button id="hintBtn" class="secondary">Voir un indice</button>
+        <button class="secondary backBtn">Retour au choix</button>
+      </div>
+
+      <div id="hintBox" class="hint-box hidden"></div>
+    </section>
+
+    <section class="card result-card hidden-section" id="resultSection">
+      <h2>3. Résultat de la correction</h2>
+
+      <div class="score-zone">
+        <div class="score-circle">
+          <span id="scoreValue">0%</span>
+        </div>
+
+        <div class="score-details">
+          <h3 id="feedbackTitle">En attente de correction</h3>
+          <p id="feedbackMessage">
+            Saisissez un texte de référence et une dictée d’élève pour commencer.
+          </p>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat">
+          <strong id="totalWords">0</strong>
+          <span>Mots attendus</span>
+        </div>
+
+        <div class="stat">
+          <strong id="correctWords">0</strong>
+          <span>Mots corrects</span>
+        </div>
+
+        <div class="stat">
+          <strong id="errorWords">0</strong>
+          <span>Erreurs repérées</span>
+        </div>
+      </div>
+
+      <h3>Correction interactive</h3>
+      <div id="correctionOutput" class="correction-output">
+        La correction apparaîtra ici.
+      </div>
+
+      <h3>Liste des erreurs</h3>
+      <ul id="errorList" class="error-list">
+        <li>Aucune correction effectuée.</li>
+      </ul>
+
+      <div class="actions">
+        <button id="printBtn" class="secondary">Imprimer le résultat</button>
+        <button id="exportBtn" class="secondary">Exporter en texte</button>
+      </div>
+    </section>
+
+    <section class="card game-card hidden-section" id="gameSection">
+      <h2>4. Mini-jeu de remédiation</h2>
+      <p class="hint">
+        Après la correction, l’élève peut refaire les mots mal écrits.
+      </p>
+
+      <div id="gameBox" class="game-box">
+        <p>Aucun mot à retravailler pour le moment.</p>
+      </div>
+
+      <div class="actions">
+        <button id="startGameBtn">Lancer le mini-jeu</button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>
+      Dictée Coach IA — outil d’assistance. La validation finale reste sous la responsabilité de l’enseignant.
+    </p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
