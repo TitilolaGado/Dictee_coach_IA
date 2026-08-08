@@ -12,107 +12,176 @@
 <body>
 
   <header class="app-header">
-    <div>
-      <h1>Dictée Coach IA</h1>
-      <p>Correction, suivi collectif et consultation des résultats de dictée</p>
+    <div class="brand">
+      <div class="logo-bubble">D</div>
+      <div>
+        <h1>Dictée Coach IA</h1>
+        <p>Corriger, suivre et progresser autrement</p>
+      </div>
     </div>
 
-    <span class="badge">Application pédagogique</span>
+    <div class="header-actions">
+      <span id="connectedUserBadge" class="user-badge hidden"></span>
+      <button id="logoutBtn" class="logout-btn hidden">Déconnexion</button>
+    </div>
   </header>
 
-  <section class="home-section" id="homeSection">
-    <h2>Bienvenue</h2>
-    <p>
-      Cette application permet à l’enseignant de créer une évaluation de dictée,
-      de corriger les copies des élèves, de suivre les résultats de la classe et de permettre
-      aux apprenants de consulter leurs résultats par date.
-    </p>
+  <section id="authSection" class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-illustration">
+        <div class="floating-icon">✍️</div>
+        <h2>Bienvenue sur Dictée Coach IA</h2>
+        <p>
+          Une application pédagogique pour aider l’enseignant à corriger les dictées,
+          suivre les résultats de la classe et permettre aux apprenants de consulter
+          leur progression.
+        </p>
+      </div>
+
+      <div class="auth-panel">
+        <div class="tabs">
+          <button id="loginTabBtn" class="tab active">Connexion</button>
+          <button id="registerTabBtn" class="tab">Inscription</button>
+        </div>
+
+        <form id="loginForm" class="auth-form">
+          <h3>Se connecter</h3>
+
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" placeholder="exemple@email.com" />
+
+          <label for="loginPassword">Mot de passe</label>
+          <input type="password" id="loginPassword" placeholder="Votre mot de passe" />
+
+          <button type="submit">Entrer dans l’application</button>
+
+          <p class="mini-text">
+            Pas encore de compte ? Cliquez sur <strong>Inscription</strong>.
+          </p>
+        </form>
+
+        <form id="registerForm" class="auth-form hidden">
+          <h3>Créer un compte</h3>
+
+          <label for="registerName">Nom et prénom</label>
+          <input type="text" id="registerName" placeholder="Exemple : GADO Zaénab" />
+
+          <label for="registerEmail">Email</label>
+          <input type="email" id="registerEmail" placeholder="exemple@email.com" />
+
+          <label for="registerPassword">Mot de passe</label>
+          <input type="password" id="registerPassword" placeholder="Créer un mot de passe" />
+
+          <label for="registerRole">Profil</label>
+          <select id="registerRole">
+            <option value="">Choisir un profil</option>
+            <option value="enseignant">Enseignant</option>
+            <option value="apprenant">Apprenant</option>
+          </select>
+
+          <label for="registerClass">Classe, pour les apprenants</label>
+          <input type="text" id="registerClass" placeholder="Exemple : 4e A" />
+
+          <button type="submit">Créer mon compte</button>
+
+          <p class="mini-text">
+            Déjà inscrit ? Cliquez sur <strong>Connexion</strong>.
+          </p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section id="homeSection" class="home-section hidden">
+    <div class="hero-card">
+      <div>
+        <span class="pill">Application ludique de dictée</span>
+        <h2 id="welcomeTitle">Bienvenue</h2>
+        <p id="welcomeText">
+          Choisissez votre espace pour commencer.
+        </p>
+      </div>
+
+      <div class="hero-emoji">📘✨</div>
+    </div>
 
     <div class="home-buttons">
-      <button id="teacherDashboardBtn">Tableau de bord enseignant</button>
-      <button id="studentResultsBtn" class="secondary">Consulter mes résultats</button>
+      <button id="teacherDashboardBtn" class="hidden">Tableau de bord enseignant</button>
+      <button id="studentResultsBtn" class="secondary hidden">Consulter mes résultats</button>
     </div>
   </section>
 
   <main class="container">
 
-    <!-- TABLEAU DE BORD ENSEIGNANT -->
     <section class="card hidden-section" id="teacherDashboardSection">
       <h2>Tableau de bord enseignant</h2>
 
       <p class="hint">
-        L’enseignant crée une évaluation, ajoute les copies des élèves, corrige les dictées
-        et consulte les résultats de toute la classe.
+        Créez une évaluation, corrigez les copies des élèves et suivez les résultats de toute la classe.
       </p>
 
       <div class="dashboard-grid">
-        <button id="showCreateEvaluationBtn">Créer une évaluation</button>
-        <button id="showCorrectCopyBtn" class="secondary">Ajouter / corriger une copie</button>
-        <button id="showClassResultsBtn" class="secondary">Résultats de la classe</button>
-        <button id="exportAllBtn" class="secondary">Exporter les résultats</button>
-        <button id="resetAppBtn" class="danger">Réinitialiser l’application</button>
-        <button class="secondary backHomeBtn">Retour à l’accueil</button>
+        <button id="showCreateEvaluationBtn">➕ Créer une évaluation</button>
+        <button id="showCorrectCopyBtn" class="secondary">📝 Ajouter / corriger une copie</button>
+        <button id="showClassResultsBtn" class="secondary">📊 Résultats de la classe</button>
+        <button id="exportAllBtn" class="secondary">📥 Exporter les résultats</button>
+        <button id="resetAppBtn" class="danger">🗑️ Réinitialiser</button>
+        <button class="secondary backHomeBtn">🏠 Accueil</button>
+      </div>
+
+      <div class="quick-stats">
+        <div class="quick-stat">
+          <strong id="statEvaluations">0</strong>
+          <span>Évaluations</span>
+        </div>
+
+        <div class="quick-stat">
+          <strong id="statCopies">0</strong>
+          <span>Copies corrigées</span>
+        </div>
+
+        <div class="quick-stat">
+          <strong id="statAverage">0%</strong>
+          <span>Moyenne générale</span>
+        </div>
       </div>
     </section>
 
-    <!-- CRÉER UNE ÉVALUATION -->
     <section class="card hidden-section" id="createEvaluationSection">
-      <h2>1. Créer une évaluation de dictée</h2>
+      <h2>Créer une évaluation de dictée</h2>
 
-      <p class="hint">
-        Renseignez les informations de l’évaluation et le texte original de la dictée.
-        Ce texte servira de base pour toutes les corrections.
-      </p>
+      <div class="form-grid">
+        <div>
+          <label for="evaluationTitle">Titre de la dictée</label>
+          <input type="text" id="evaluationTitle" placeholder="Exemple : Dictée sur l’intelligence artificielle" />
+        </div>
 
-      <label for="evaluationTitle">Titre de la dictée</label>
-      <input
-        type="text"
-        id="evaluationTitle"
-        placeholder="Exemple : Dictée sur l’intelligence artificielle"
-      />
+        <div>
+          <label for="evaluationClass">Classe</label>
+          <input type="text" id="evaluationClass" placeholder="Exemple : 4e A" />
+        </div>
 
-      <label for="evaluationClass">Classe</label>
-      <input
-        type="text"
-        id="evaluationClass"
-        placeholder="Exemple : 4e"
-      />
+        <div>
+          <label for="evaluationDate">Date de l’évaluation</label>
+          <input type="date" id="evaluationDate" />
+        </div>
 
-      <label for="evaluationDate">Date de l’évaluation</label>
-      <input
-        type="date"
-        id="evaluationDate"
-      />
-
-      <label for="evaluationScale">Barème</label>
-      <input
-        type="number"
-        id="evaluationScale"
-        placeholder="Exemple : 20"
-        min="1"
-        value="20"
-      />
+        <div>
+          <label for="evaluationScale">Barème</label>
+          <input type="number" id="evaluationScale" min="1" value="20" />
+        </div>
+      </div>
 
       <label for="referenceText">Texte original de la dictée</label>
-      <textarea
-        id="referenceText"
-        placeholder="Saisissez ici le texte original de la dictée..."
-      ></textarea>
+      <textarea id="referenceText" placeholder="Saisissez ici le texte original de la dictée..."></textarea>
 
       <div class="scan-zone">
-        <h3>Importer le modèle par photo ou scan</h3>
-
+        <h3>📷 Importer le modèle par photo ou scan</h3>
         <p class="hint">
-          Vous pouvez prendre en photo le modèle de dictée ou importer une image déjà scannée.
-          Le texte reconnu apparaîtra dans la zone du texte original.
+          Prenez une photo ou importez une image. Le texte reconnu apparaîtra dans la zone du texte original.
         </p>
 
-        <input
-          type="file"
-          id="teacherImageInput"
-          accept="image/*"
-          capture="environment"
-        />
+        <input type="file" id="teacherImageInput" accept="image/*" capture="environment" />
 
         <div class="actions">
           <button id="scanTeacherBtn" class="secondary">Lire l’image du modèle</button>
@@ -122,25 +191,18 @@
       </div>
 
       <p class="warning-text">
-        Attention : la lecture automatique peut contenir des erreurs. L’enseignant doit toujours
-        vérifier le texte extrait avant d’enregistrer l’évaluation.
+        La lecture automatique peut contenir des erreurs. L’enseignant doit vérifier le texte avant l’enregistrement.
       </p>
 
       <div class="actions">
         <button id="saveEvaluationBtn">Enregistrer l’évaluation</button>
-        <button id="clearEvaluationFormBtn" class="secondary">Vider le formulaire</button>
+        <button id="clearEvaluationFormBtn" class="secondary">Vider</button>
         <button class="secondary backDashboardBtn">Retour au tableau de bord</button>
       </div>
     </section>
 
-    <!-- AJOUTER / CORRIGER UNE COPIE -->
     <section class="card hidden-section" id="correctCopySection">
-      <h2>2. Ajouter et corriger une copie élève</h2>
-
-      <p class="hint">
-        Sélectionnez une évaluation existante, renseignez l’identité de l’élève,
-        importez ou saisissez sa copie, puis lancez la correction.
-      </p>
+      <h2>Ajouter et corriger une copie</h2>
 
       <label for="evaluationSelect">Évaluation</label>
       <select id="evaluationSelect">
@@ -149,40 +211,29 @@
 
       <div id="selectedEvaluationInfo" class="info-box hidden"></div>
 
-      <label for="studentFullName">Nom et prénom de l’élève</label>
-      <input
-        type="text"
-        id="studentFullName"
-        placeholder="Exemple : Aïcha KORA"
-      />
+      <div class="form-grid">
+        <div>
+          <label for="studentFullName">Nom et prénom de l’élève</label>
+          <input type="text" id="studentFullName" placeholder="Exemple : Aïcha KORA" />
+        </div>
 
-      <label for="studentClass">Classe de l’élève</label>
-      <input
-        type="text"
-        id="studentClass"
-        placeholder="Exemple : 4e"
-      />
+        <div>
+          <label for="studentClass">Classe de l’élève</label>
+          <input type="text" id="studentClass" placeholder="Exemple : 4e A" />
+        </div>
+      </div>
 
       <label for="studentText">Texte de la copie élève</label>
-      <textarea
-        id="studentText"
-        placeholder="Saisissez ici le texte de l’élève ou importez une photo de sa copie..."
-      ></textarea>
+      <textarea id="studentText" placeholder="Saisissez ou importez le texte de la copie élève..."></textarea>
 
       <div class="scan-zone">
-        <h3>Importer la copie manuscrite par photo ou scan</h3>
+        <h3>📸 Importer la copie manuscrite</h3>
 
         <p class="hint">
-          Prenez une photo nette de la copie. Le texte reconnu sera placé dans la zone ci-dessus.
-          Il doit être relu avant la correction.
+          Importez une photo nette de la copie. Relisez le texte reconnu avant la correction.
         </p>
 
-        <input
-          type="file"
-          id="studentImageInput"
-          accept="image/*"
-          capture="environment"
-        />
+        <input type="file" id="studentImageInput" accept="image/*" capture="environment" />
 
         <div class="actions">
           <button id="scanStudentBtn" class="secondary">Lire l’image de la copie</button>
@@ -191,21 +242,15 @@
         <p id="studentScanStatus" class="scan-status"></p>
       </div>
 
-      <p class="warning-text">
-        La correction automatique est une aide. L’enseignant doit vérifier le texte extrait,
-        valider les erreurs et apprécier le résultat final.
-      </p>
-
       <div class="actions">
-        <button id="correctAndSaveBtn">Corriger et enregistrer le résultat</button>
+        <button id="correctAndSaveBtn">Corriger et enregistrer</button>
         <button id="clearCopyFormBtn" class="secondary">Vider la copie</button>
         <button class="secondary backDashboardBtn">Retour au tableau de bord</button>
       </div>
     </section>
 
-    <!-- RÉSULTAT DE LA DERNIÈRE CORRECTION -->
     <section class="card hidden-section" id="singleResultSection">
-      <h2>3. Résultat de la dernière correction</h2>
+      <h2>Résultat de la dernière correction</h2>
 
       <div class="score-zone">
         <div class="score-circle">
@@ -214,9 +259,7 @@
 
         <div class="score-details">
           <h3 id="feedbackTitle">En attente de correction</h3>
-          <p id="feedbackMessage">
-            Le résultat détaillé apparaîtra après correction.
-          </p>
+          <p id="feedbackMessage">Le résultat détaillé apparaîtra ici.</p>
         </div>
       </div>
 
@@ -252,37 +295,31 @@
       </div>
     </section>
 
-    <!-- RÉSULTATS DE CLASSE -->
     <section class="card hidden-section" id="classResultsSection">
-      <h2>4. Résultats collectifs de la classe</h2>
-
-      <p class="hint">
-        Les résultats enregistrés s’affichent ici. Vous pouvez filtrer par évaluation,
-        par classe ou par nom d’élève.
-      </p>
+      <h2>Résultats collectifs</h2>
 
       <div class="filter-grid">
         <div>
-          <label for="filterEvaluation">Filtrer par évaluation</label>
+          <label for="filterEvaluation">Évaluation</label>
           <select id="filterEvaluation">
             <option value="">Toutes les évaluations</option>
           </select>
         </div>
 
         <div>
-          <label for="filterClass">Filtrer par classe</label>
-          <input type="text" id="filterClass" placeholder="Exemple : 4e" />
+          <label for="filterClass">Classe</label>
+          <input type="text" id="filterClass" placeholder="Exemple : 4e A" />
         </div>
 
         <div>
-          <label for="filterStudent">Filtrer par élève</label>
+          <label for="filterStudent">Élève</label>
           <input type="text" id="filterStudent" placeholder="Nom ou prénom" />
         </div>
       </div>
 
       <div class="actions">
         <button id="applyFiltersBtn">Appliquer les filtres</button>
-        <button id="clearFiltersBtn" class="secondary">Effacer les filtres</button>
+        <button id="clearFiltersBtn" class="secondary">Effacer</button>
         <button class="secondary backDashboardBtn">Retour au tableau de bord</button>
       </div>
 
@@ -309,39 +346,34 @@
       </div>
     </section>
 
-    <!-- ESPACE CONSULTATION ÉLÈVE -->
     <section class="card hidden-section" id="studentConsultationSection">
-      <h2>Espace consultation élève</h2>
+      <h2>Espace apprenant</h2>
 
       <p class="hint">
-        L’apprenant peut consulter ses résultats en renseignant son nom, sa classe
-        et éventuellement une date d’évaluation.
+        Consultez vos résultats par nom, classe et date d’évaluation.
       </p>
 
-      <label for="searchStudentName">Nom et prénom</label>
-      <input
-        type="text"
-        id="searchStudentName"
-        placeholder="Exemple : Aïcha KORA"
-      />
+      <div class="form-grid">
+        <div>
+          <label for="searchStudentName">Nom et prénom</label>
+          <input type="text" id="searchStudentName" placeholder="Exemple : Aïcha KORA" />
+        </div>
 
-      <label for="searchStudentClass">Classe</label>
-      <input
-        type="text"
-        id="searchStudentClass"
-        placeholder="Exemple : 4e"
-      />
+        <div>
+          <label for="searchStudentClass">Classe</label>
+          <input type="text" id="searchStudentClass" placeholder="Exemple : 4e A" />
+        </div>
 
-      <label for="searchEvaluationDate">Date d’évaluation</label>
-      <input
-        type="date"
-        id="searchEvaluationDate"
-      />
+        <div>
+          <label for="searchEvaluationDate">Date</label>
+          <input type="date" id="searchEvaluationDate" />
+        </div>
+      </div>
 
       <div class="actions">
         <button id="searchStudentResultsBtn">Voir mes résultats</button>
         <button id="clearStudentSearchBtn" class="secondary">Effacer</button>
-        <button class="secondary backHomeBtn">Retour à l’accueil</button>
+        <button class="secondary backHomeBtn">Accueil</button>
       </div>
 
       <div id="studentResultsBox" class="student-results-box">
@@ -353,7 +385,7 @@
 
   <footer>
     <p>
-      Dictée Coach IA — outil d’assistance pédagogique. La décision finale reste sous la responsabilité de l’enseignant.
+      Dictée Coach IA — l’enseignant reste responsable de la validation pédagogique finale.
     </p>
   </footer>
 

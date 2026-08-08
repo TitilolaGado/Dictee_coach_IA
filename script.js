@@ -1,206 +1,299 @@
+let users = [];
+let currentUser = null;
 let evaluations = [];
 let lastCorrection = null;
 
-const homeSection = document.getElementById("homeSection");
-
-const teacherDashboardSection = document.getElementById("teacherDashboardSection");
-const createEvaluationSection = document.getElementById("createEvaluationSection");
-const correctCopySection = document.getElementById("correctCopySection");
-const singleResultSection = document.getElementById("singleResultSection");
-const classResultsSection = document.getElementById("classResultsSection");
-const studentConsultationSection = document.getElementById("studentConsultationSection");
-
-const teacherDashboardBtn = document.getElementById("teacherDashboardBtn");
-const studentResultsBtn = document.getElementById("studentResultsBtn");
-
-const showCreateEvaluationBtn = document.getElementById("showCreateEvaluationBtn");
-const showCorrectCopyBtn = document.getElementById("showCorrectCopyBtn");
-const showClassResultsBtn = document.getElementById("showClassResultsBtn");
-const exportAllBtn = document.getElementById("exportAllBtn");
-const resetAppBtn = document.getElementById("resetAppBtn");
-
-const backHomeBtns = document.querySelectorAll(".backHomeBtn");
-const backDashboardBtns = document.querySelectorAll(".backDashboardBtn");
-
-const evaluationTitle = document.getElementById("evaluationTitle");
-const evaluationClass = document.getElementById("evaluationClass");
-const evaluationDate = document.getElementById("evaluationDate");
-const evaluationScale = document.getElementById("evaluationScale");
-const referenceText = document.getElementById("referenceText");
-
-const teacherImageInput = document.getElementById("teacherImageInput");
-const scanTeacherBtn = document.getElementById("scanTeacherBtn");
-const teacherScanStatus = document.getElementById("teacherScanStatus");
-
-const saveEvaluationBtn = document.getElementById("saveEvaluationBtn");
-const clearEvaluationFormBtn = document.getElementById("clearEvaluationFormBtn");
-
-const evaluationSelect = document.getElementById("evaluationSelect");
-const selectedEvaluationInfo = document.getElementById("selectedEvaluationInfo");
-
-const studentFullName = document.getElementById("studentFullName");
-const studentClass = document.getElementById("studentClass");
-const studentText = document.getElementById("studentText");
-
-const studentImageInput = document.getElementById("studentImageInput");
-const scanStudentBtn = document.getElementById("scanStudentBtn");
-const studentScanStatus = document.getElementById("studentScanStatus");
-
-const correctAndSaveBtn = document.getElementById("correctAndSaveBtn");
-const clearCopyFormBtn = document.getElementById("clearCopyFormBtn");
-
-const scoreValue = document.getElementById("scoreValue");
-const feedbackTitle = document.getElementById("feedbackTitle");
-const feedbackMessage = document.getElementById("feedbackMessage");
-const totalWords = document.getElementById("totalWords");
-const correctWords = document.getElementById("correctWords");
-const errorWords = document.getElementById("errorWords");
-const correctionOutput = document.getElementById("correctionOutput");
-const errorList = document.getElementById("errorList");
-const printSingleBtn = document.getElementById("printSingleBtn");
-
-const filterEvaluation = document.getElementById("filterEvaluation");
-const filterClass = document.getElementById("filterClass");
-const filterStudent = document.getElementById("filterStudent");
-const applyFiltersBtn = document.getElementById("applyFiltersBtn");
-const clearFiltersBtn = document.getElementById("clearFiltersBtn");
-const classResultsBody = document.getElementById("classResultsBody");
-
-const searchStudentName = document.getElementById("searchStudentName");
-const searchStudentClass = document.getElementById("searchStudentClass");
-const searchEvaluationDate = document.getElementById("searchEvaluationDate");
-const searchStudentResultsBtn = document.getElementById("searchStudentResultsBtn");
-const clearStudentSearchBtn = document.getElementById("clearStudentSearchBtn");
-const studentResultsBox = document.getElementById("studentResultsBox");
-
-teacherDashboardBtn.addEventListener("click", showTeacherDashboard);
-studentResultsBtn.addEventListener("click", showStudentConsultation);
-
-showCreateEvaluationBtn.addEventListener("click", showCreateEvaluation);
-showCorrectCopyBtn.addEventListener("click", showCorrectCopy);
-showClassResultsBtn.addEventListener("click", showClassResults);
-exportAllBtn.addEventListener("click", exportAllResults);
-resetAppBtn.addEventListener("click", resetApplication);
-
-backHomeBtns.forEach((btn) => {
-  btn.addEventListener("click", showHome);
+document.addEventListener("DOMContentLoaded", function () {
+  loadAllData();
+  bindEvents();
+  initializeDate();
+  updateAuthUI();
 });
 
-backDashboardBtns.forEach((btn) => {
-  btn.addEventListener("click", showTeacherDashboard);
-});
+function bindEvents() {
+  document.getElementById("loginTabBtn").addEventListener("click", showLoginForm);
+  document.getElementById("registerTabBtn").addEventListener("click", showRegisterForm);
 
-saveEvaluationBtn.addEventListener("click", saveEvaluation);
-clearEvaluationFormBtn.addEventListener("click", clearEvaluationForm);
+  document.getElementById("loginForm").addEventListener("submit", loginUser);
+  document.getElementById("registerForm").addEventListener("submit", registerUser);
+  document.getElementById("logoutBtn").addEventListener("click", logoutUser);
 
-evaluationSelect.addEventListener("change", showSelectedEvaluationInfo);
+  document.getElementById("teacherDashboardBtn").addEventListener("click", showTeacherDashboard);
+  document.getElementById("studentResultsBtn").addEventListener("click", showStudentConsultation);
 
-correctAndSaveBtn.addEventListener("click", correctAndSaveCopy);
-clearCopyFormBtn.addEventListener("click", clearCopyForm);
+  document.getElementById("showCreateEvaluationBtn").addEventListener("click", showCreateEvaluation);
+  document.getElementById("showCorrectCopyBtn").addEventListener("click", showCorrectCopy);
+  document.getElementById("showClassResultsBtn").addEventListener("click", showClassResults);
 
-scanTeacherBtn.addEventListener("click", scanTeacherImage);
-scanStudentBtn.addEventListener("click", scanStudentImage);
+  document.getElementById("exportAllBtn").addEventListener("click", exportAllResults);
+  document.getElementById("resetAppBtn").addEventListener("click", resetApplication);
 
-printSingleBtn.addEventListener("click", () => window.print());
+  document.querySelectorAll(".backHomeBtn").forEach(function (btn) {
+    btn.addEventListener("click", showHome);
+  });
 
-applyFiltersBtn.addEventListener("click", renderClassResults);
-clearFiltersBtn.addEventListener("click", clearFilters);
+  document.querySelectorAll(".backDashboardBtn").forEach(function (btn) {
+    btn.addEventListener("click", showTeacherDashboard);
+  });
 
-searchStudentResultsBtn.addEventListener("click", searchStudentResults);
-clearStudentSearchBtn.addEventListener("click", clearStudentSearch);
+  document.getElementById("saveEvaluationBtn").addEventListener("click", saveEvaluation);
+  document.getElementById("clearEvaluationFormBtn").addEventListener("click", clearEvaluationForm);
 
-function loadEvaluations() {
-  const saved = localStorage.getItem("dicteeCoachEvaluations");
+  document.getElementById("evaluationSelect").addEventListener("change", showSelectedEvaluationInfo);
 
-  if (saved) {
-    evaluations = JSON.parse(saved);
-  } else {
-    evaluations = [];
-  }
+  document.getElementById("correctAndSaveBtn").addEventListener("click", correctAndSaveCopy);
+  document.getElementById("clearCopyFormBtn").addEventListener("click", clearCopyForm);
+
+  document.getElementById("scanTeacherBtn").addEventListener("click", scanTeacherImage);
+  document.getElementById("scanStudentBtn").addEventListener("click", scanStudentImage);
+
+  document.getElementById("printSingleBtn").addEventListener("click", function () {
+    window.print();
+  });
+
+  document.getElementById("applyFiltersBtn").addEventListener("click", renderClassResults);
+  document.getElementById("clearFiltersBtn").addEventListener("click", clearFilters);
+
+  document.getElementById("searchStudentResultsBtn").addEventListener("click", searchStudentResults);
+  document.getElementById("clearStudentSearchBtn").addEventListener("click", clearStudentSearch);
 }
 
-function saveEvaluationsToStorage() {
+function loadAllData() {
+  users = JSON.parse(localStorage.getItem("dicteeCoachUsers")) || [];
+  currentUser = JSON.parse(localStorage.getItem("dicteeCoachCurrentUser")) || null;
+  evaluations = JSON.parse(localStorage.getItem("dicteeCoachEvaluations")) || [];
+}
+
+function saveUsers() {
+  localStorage.setItem("dicteeCoachUsers", JSON.stringify(users));
+}
+
+function saveCurrentUser() {
+  localStorage.setItem("dicteeCoachCurrentUser", JSON.stringify(currentUser));
+}
+
+function saveEvaluations() {
   localStorage.setItem("dicteeCoachEvaluations", JSON.stringify(evaluations));
 }
 
-function generateId(prefix) {
-  return `${prefix}_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
+function showLoginForm() {
+  document.getElementById("loginTabBtn").classList.add("active");
+  document.getElementById("registerTabBtn").classList.remove("active");
+  document.getElementById("loginForm").classList.remove("hidden");
+  document.getElementById("registerForm").classList.add("hidden");
 }
 
-function hideAllSections() {
-  homeSection.classList.add("hidden-section");
-  teacherDashboardSection.classList.add("hidden-section");
-  createEvaluationSection.classList.add("hidden-section");
-  correctCopySection.classList.add("hidden-section");
-  singleResultSection.classList.add("hidden-section");
-  classResultsSection.classList.add("hidden-section");
-  studentConsultationSection.classList.add("hidden-section");
+function showRegisterForm() {
+  document.getElementById("registerTabBtn").classList.add("active");
+  document.getElementById("loginTabBtn").classList.remove("active");
+  document.getElementById("registerForm").classList.remove("hidden");
+  document.getElementById("loginForm").classList.add("hidden");
+}
+
+function registerUser(event) {
+  event.preventDefault();
+
+  const name = document.getElementById("registerName").value.trim();
+  const email = document.getElementById("registerEmail").value.trim().toLowerCase();
+  const password = document.getElementById("registerPassword").value.trim();
+  const role = document.getElementById("registerRole").value;
+  const classe = document.getElementById("registerClass").value.trim();
+
+  if (!name || !email || !password || !role) {
+    alert("Veuillez remplir le nom, l’email, le mot de passe et le profil.");
+    return;
+  }
+
+  const exists = users.some(function (user) {
+    return user.email === email;
+  });
+
+  if (exists) {
+    alert("Un compte existe déjà avec cet email.");
+    return;
+  }
+
+  const user = {
+    id: generateId("user"),
+    name: name,
+    email: email,
+    password: password,
+    role: role,
+    classe: classe,
+    createdAt: new Date().toISOString()
+  };
+
+  users.push(user);
+  saveUsers();
+
+  alert("Compte créé avec succès. Vous pouvez maintenant vous connecter.");
+
+  document.getElementById("registerForm").reset();
+  showLoginForm();
+}
+
+function loginUser(event) {
+  event.preventDefault();
+
+  const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+  const password = document.getElementById("loginPassword").value.trim();
+
+  const user = users.find(function (item) {
+    return item.email === email && item.password === password;
+  });
+
+  if (!user) {
+    alert("Email ou mot de passe incorrect.");
+    return;
+  }
+
+  currentUser = user;
+  saveCurrentUser();
+
+  document.getElementById("loginForm").reset();
+  updateAuthUI();
+}
+
+function logoutUser() {
+  currentUser = null;
+  localStorage.removeItem("dicteeCoachCurrentUser");
+  updateAuthUI();
+}
+
+function updateAuthUI() {
+  const authSection = document.getElementById("authSection");
+  const homeSection = document.getElementById("homeSection");
+  const badge = document.getElementById("connectedUserBadge");
+  const logoutBtn = document.getElementById("logoutBtn");
+  const teacherBtn = document.getElementById("teacherDashboardBtn");
+  const studentBtn = document.getElementById("studentResultsBtn");
+
+  hideAllAppSections();
+
+  if (!currentUser) {
+    authSection.classList.remove("hidden");
+    homeSection.classList.add("hidden");
+    badge.classList.add("hidden");
+    logoutBtn.classList.add("hidden");
+    return;
+  }
+
+  authSection.classList.add("hidden");
+  homeSection.classList.remove("hidden");
+  badge.classList.remove("hidden");
+  logoutBtn.classList.remove("hidden");
+
+  badge.textContent = `${currentUser.name} — ${currentUser.role}`;
+
+  document.getElementById("welcomeTitle").textContent = `Bonjour ${currentUser.name}`;
+  document.getElementById("welcomeText").textContent =
+    currentUser.role === "enseignant"
+      ? "Vous pouvez créer une évaluation, corriger les copies et consulter les résultats collectifs."
+      : "Vous pouvez consulter vos résultats de dictées enregistrés par votre enseignant.";
+
+  teacherBtn.classList.toggle("hidden", currentUser.role !== "enseignant");
+  studentBtn.classList.toggle("hidden", currentUser.role !== "apprenant");
+
+  if (currentUser.role === "apprenant") {
+    document.getElementById("searchStudentName").value = currentUser.name;
+    document.getElementById("searchStudentClass").value = currentUser.classe || "";
+  }
+
+  populateEvaluationSelects();
+  updateDashboardStats();
+}
+
+function hideAllAppSections() {
+  const sections = [
+    "teacherDashboardSection",
+    "createEvaluationSection",
+    "correctCopySection",
+    "singleResultSection",
+    "classResultsSection",
+    "studentConsultationSection"
+  ];
+
+  sections.forEach(function (id) {
+    document.getElementById(id).classList.add("hidden-section");
+  });
 }
 
 function showHome() {
-  hideAllSections();
-  homeSection.classList.remove("hidden-section");
+  hideAllAppSections();
+  document.getElementById("homeSection").classList.remove("hidden");
 }
 
 function showTeacherDashboard() {
-  hideAllSections();
-  teacherDashboardSection.classList.remove("hidden-section");
+  if (!requireRole("enseignant")) return;
+
+  hideAllAppSections();
+  document.getElementById("teacherDashboardSection").classList.remove("hidden-section");
+  updateDashboardStats();
 }
 
 function showStudentConsultation() {
-  hideAllSections();
-  studentConsultationSection.classList.remove("hidden-section");
+  if (!requireRole("apprenant")) return;
+
+  hideAllAppSections();
+  document.getElementById("studentConsultationSection").classList.remove("hidden-section");
+
+  document.getElementById("searchStudentName").value = currentUser.name;
+  document.getElementById("searchStudentClass").value = currentUser.classe || "";
 }
 
 function showCreateEvaluation() {
-  hideAllSections();
-  createEvaluationSection.classList.remove("hidden-section");
+  if (!requireRole("enseignant")) return;
+
+  hideAllAppSections();
+  document.getElementById("createEvaluationSection").classList.remove("hidden-section");
 }
 
 function showCorrectCopy() {
-  hideAllSections();
-  correctCopySection.classList.remove("hidden-section");
-  singleResultSection.classList.remove("hidden-section");
+  if (!requireRole("enseignant")) return;
+
+  hideAllAppSections();
+  document.getElementById("correctCopySection").classList.remove("hidden-section");
+  document.getElementById("singleResultSection").classList.remove("hidden-section");
+
   populateEvaluationSelects();
   showSelectedEvaluationInfo();
 }
 
 function showClassResults() {
-  hideAllSections();
-  classResultsSection.classList.remove("hidden-section");
+  if (!requireRole("enseignant")) return;
+
+  hideAllAppSections();
+  document.getElementById("classResultsSection").classList.remove("hidden-section");
+
   populateEvaluationSelects();
   renderClassResults();
 }
 
+function requireRole(role) {
+  if (!currentUser || currentUser.role !== role) {
+    alert("Accès non autorisé pour ce profil.");
+    return false;
+  }
+
+  return true;
+}
+
 function saveEvaluation() {
-  const title = evaluationTitle.value.trim();
-  const classe = evaluationClass.value.trim();
-  const date = evaluationDate.value;
-  const scale = Number(evaluationScale.value) || 20;
-  const text = referenceText.value.trim();
+  const title = document.getElementById("evaluationTitle").value.trim();
+  const classe = document.getElementById("evaluationClass").value.trim();
+  const date = document.getElementById("evaluationDate").value;
+  const scale = Number(document.getElementById("evaluationScale").value) || 20;
+  const text = document.getElementById("referenceText").value.trim();
 
-  if (!title) {
-    alert("Veuillez renseigner le titre de la dictée.");
-    return;
-  }
-
-  if (!classe) {
-    alert("Veuillez renseigner la classe.");
-    return;
-  }
-
-  if (!date) {
-    alert("Veuillez renseigner la date de l’évaluation.");
-    return;
-  }
-
-  if (!text) {
-    alert("Veuillez saisir ou importer le texte original de la dictée.");
+  if (!title || !classe || !date || !text) {
+    alert("Veuillez remplir le titre, la classe, la date et le texte original.");
     return;
   }
 
   const evaluation = {
     id: generateId("eval"),
+    teacherId: currentUser.id,
+    teacherName: currentUser.name,
     title: title,
     classe: classe,
     date: date,
@@ -211,89 +304,92 @@ function saveEvaluation() {
   };
 
   evaluations.push(evaluation);
-  saveEvaluationsToStorage();
-  populateEvaluationSelects();
+  saveEvaluations();
 
   alert("Évaluation enregistrée avec succès.");
 
   clearEvaluationForm();
+  populateEvaluationSelects();
+  updateDashboardStats();
   showTeacherDashboard();
 }
 
 function clearEvaluationForm() {
-  evaluationTitle.value = "";
-  evaluationClass.value = "";
-  evaluationDate.value = "";
-  evaluationScale.value = 20;
-  referenceText.value = "";
-  teacherImageInput.value = "";
-  teacherScanStatus.textContent = "";
-  teacherScanStatus.className = "scan-status";
+  document.getElementById("evaluationTitle").value = "";
+  document.getElementById("evaluationClass").value = "";
+  document.getElementById("evaluationScale").value = 20;
+  document.getElementById("referenceText").value = "";
+  document.getElementById("teacherImageInput").value = "";
+  document.getElementById("teacherScanStatus").textContent = "";
+
+  initializeDate();
 }
 
 function populateEvaluationSelects() {
+  const evaluationSelect = document.getElementById("evaluationSelect");
+  const filterEvaluation = document.getElementById("filterEvaluation");
+
   evaluationSelect.innerHTML = "";
   filterEvaluation.innerHTML = '<option value="">Toutes les évaluations</option>';
 
-  if (evaluations.length === 0) {
+  const visibleEvaluations = currentUser && currentUser.role === "enseignant"
+    ? evaluations.filter(function (evaluation) {
+        return evaluation.teacherId === currentUser.id;
+      })
+    : evaluations;
+
+  if (visibleEvaluations.length === 0) {
     evaluationSelect.innerHTML = '<option value="">Aucune évaluation disponible</option>';
     return;
   }
 
-  evaluations.forEach((evaluation) => {
+  visibleEvaluations.forEach(function (evaluation) {
+    const label = `${formatDate(evaluation.date)} - ${evaluation.title} - ${evaluation.classe}`;
+
     const option = document.createElement("option");
     option.value = evaluation.id;
-    option.textContent = `${formatDate(evaluation.date)} - ${evaluation.title} - ${evaluation.classe}`;
+    option.textContent = label;
     evaluationSelect.appendChild(option);
 
     const filterOption = document.createElement("option");
     filterOption.value = evaluation.id;
-    filterOption.textContent = `${formatDate(evaluation.date)} - ${evaluation.title} - ${evaluation.classe}`;
+    filterOption.textContent = label;
     filterEvaluation.appendChild(filterOption);
   });
 }
 
 function getSelectedEvaluation() {
-  const evaluationId = evaluationSelect.value;
+  const evaluationId = document.getElementById("evaluationSelect").value;
 
-  if (!evaluationId) {
-    return null;
-  }
-
-  return evaluations.find((evaluation) => evaluation.id === evaluationId) || null;
+  return evaluations.find(function (evaluation) {
+    return evaluation.id === evaluationId;
+  }) || null;
 }
 
 function showSelectedEvaluationInfo() {
+  const info = document.getElementById("selectedEvaluationInfo");
   const evaluation = getSelectedEvaluation();
 
   if (!evaluation) {
-    selectedEvaluationInfo.classList.add("hidden");
-    selectedEvaluationInfo.innerHTML = "";
+    info.classList.add("hidden");
+    info.innerHTML = "";
     return;
   }
 
-  selectedEvaluationInfo.classList.remove("hidden");
-
-  selectedEvaluationInfo.innerHTML = `
+  info.classList.remove("hidden");
+  info.innerHTML = `
     <strong>Dictée :</strong> ${escapeHTML(evaluation.title)}<br>
     <strong>Classe :</strong> ${escapeHTML(evaluation.classe)}<br>
     <strong>Date :</strong> ${formatDate(evaluation.date)}<br>
     <strong>Barème :</strong> /${evaluation.scale}<br>
-    <strong>Copies déjà corrigées :</strong> ${evaluation.copies.length}
+    <strong>Copies corrigées :</strong> ${evaluation.copies.length}
   `;
+
+  const studentClass = document.getElementById("studentClass");
 
   if (!studentClass.value.trim()) {
     studentClass.value = evaluation.classe;
   }
-}
-
-function clearCopyForm() {
-  studentFullName.value = "";
-  studentClass.value = "";
-  studentText.value = "";
-  studentImageInput.value = "";
-  studentScanStatus.textContent = "";
-  studentScanStatus.className = "scan-status";
 }
 
 function correctAndSaveCopy() {
@@ -304,30 +400,20 @@ function correctAndSaveCopy() {
     return;
   }
 
-  const name = studentFullName.value.trim();
-  const classe = studentClass.value.trim();
-  const text = studentText.value.trim();
+  const name = document.getElementById("studentFullName").value.trim();
+  const classe = document.getElementById("studentClass").value.trim();
+  const text = document.getElementById("studentText").value.trim();
 
-  if (!name) {
-    alert("Veuillez renseigner le nom et prénom de l’élève.");
-    return;
-  }
-
-  if (!classe) {
-    alert("Veuillez renseigner la classe de l’élève.");
-    return;
-  }
-
-  if (!text) {
-    alert("Veuillez saisir ou importer le texte de la copie élève.");
+  if (!name || !classe || !text) {
+    alert("Veuillez renseigner le nom, la classe et le texte de la copie.");
     return;
   }
 
   const correction = compareTexts(evaluation.referenceText, text);
   const note = Math.round((correction.score / 100) * evaluation.scale * 100) / 100;
-  const appreciation = getAppreciation(correction.score, name);
+  const appreciation = getAppreciation(correction.score);
 
-  const copyResult = {
+  const result = {
     id: generateId("copy"),
     studentName: name,
     studentClass: classe,
@@ -340,26 +426,34 @@ function correctAndSaveCopy() {
     errorCount: correction.errors.length,
     errors: correction.errors,
     correctionHTML: correction.outputHTML,
-    appreciation: appreciation.message,
+    appreciation: appreciation,
     correctedAt: new Date().toISOString()
   };
 
-  evaluation.copies.push(copyResult);
-  saveEvaluationsToStorage();
+  evaluation.copies.push(result);
+  saveEvaluations();
 
   lastCorrection = {
     evaluation: evaluation,
-    result: copyResult
+    result: result
   };
 
-  renderSingleResult(evaluation, copyResult);
+  renderSingleResult(evaluation, result);
   renderClassResults();
-  populateEvaluationSelects();
+  updateDashboardStats();
   showSelectedEvaluationInfo();
 
-  alert("Copie corrigée et résultat enregistré avec succès.");
+  alert("Copie corrigée et résultat enregistré.");
 
   clearCopyForm();
+}
+
+function clearCopyForm() {
+  document.getElementById("studentFullName").value = "";
+  document.getElementById("studentClass").value = "";
+  document.getElementById("studentText").value = "";
+  document.getElementById("studentImageInput").value = "";
+  document.getElementById("studentScanStatus").textContent = "";
 }
 
 function compareTexts(reference, student) {
@@ -424,87 +518,89 @@ function compareTexts(reference, student) {
 }
 
 function renderSingleResult(evaluation, result) {
-  singleResultSection.classList.remove("hidden-section");
+  const section = document.getElementById("singleResultSection");
+  section.classList.remove("hidden-section");
 
-  scoreValue.textContent = `${result.score}%`;
+  document.getElementById("scoreValue").textContent = `${result.score}%`;
 
-  const circle = document.querySelector(".score-circle");
+  document.querySelector(".score-circle").style.background =
+    `conic-gradient(#16a34a ${result.score}%, #e5e7eb ${result.score}%)`;
 
-  circle.style.background =
-    `conic-gradient(#22c55e ${result.score}%, #e5e7eb ${result.score}%)`;
+  document.getElementById("feedbackTitle").textContent =
+    `${result.studentName} — ${evaluation.title}`;
 
-  feedbackTitle.textContent = `${result.studentName} — ${evaluation.title}`;
-
-  feedbackMessage.innerHTML = `
+  document.getElementById("feedbackMessage").innerHTML = `
     <strong>Date :</strong> ${formatDate(evaluation.date)} |
     <strong>Classe :</strong> ${escapeHTML(result.studentClass)} |
     <strong>Note :</strong> ${result.note}/${result.scale}<br>
     ${escapeHTML(result.appreciation)}
   `;
 
-  totalWords.textContent = result.totalWords;
-  correctWords.textContent = result.correctWords;
-  errorWords.textContent = result.errorCount;
+  document.getElementById("totalWords").textContent = result.totalWords;
+  document.getElementById("correctWords").textContent = result.correctWords;
+  document.getElementById("errorWords").textContent = result.errorCount;
 
-  correctionOutput.innerHTML = result.correctionHTML || "Aucune correction disponible.";
+  document.getElementById("correctionOutput").innerHTML =
+    result.correctionHTML || "Aucune correction disponible.";
+
+  const errorList = document.getElementById("errorList");
 
   if (result.errors.length === 0) {
     errorList.innerHTML = "<li>Bravo ! Aucune erreur repérée.</li>";
-  } else {
-    errorList.innerHTML = "";
-
-    result.errors.forEach((error) => {
-      const li = document.createElement("li");
-
-      li.innerHTML = `
-        Position ${error.position} :
-        tu as écrit <strong>${escapeHTML(error.given)}</strong>,
-        il fallait écrire <strong>${escapeHTML(error.expected)}</strong>.
-        <em>Type probable : ${escapeHTML(error.type)}</em>.
-      `;
-
-      errorList.appendChild(li);
-    });
+    return;
   }
+
+  errorList.innerHTML = "";
+
+  result.errors.forEach(function (error) {
+    const li = document.createElement("li");
+
+    li.innerHTML = `
+      Position ${error.position} :
+      tu as écrit <strong>${escapeHTML(error.given)}</strong>,
+      il fallait écrire <strong>${escapeHTML(error.expected)}</strong>.
+      <em>Type probable : ${escapeHTML(error.type)}</em>.
+    `;
+
+    errorList.appendChild(li);
+  });
 }
 
 function renderClassResults() {
-  const selectedEval = filterEvaluation.value;
-  const selectedClass = normalizeForSearch(filterClass.value);
-  const selectedStudent = normalizeForSearch(filterStudent.value);
+  const body = document.getElementById("classResultsBody");
+  const selectedEval = document.getElementById("filterEvaluation").value;
+  const selectedClass = normalizeForSearch(document.getElementById("filterClass").value);
+  const selectedStudent = normalizeForSearch(document.getElementById("filterStudent").value);
 
   const rows = [];
 
-  evaluations.forEach((evaluation) => {
+  evaluations.forEach(function (evaluation) {
+    if (currentUser && currentUser.role === "enseignant" && evaluation.teacherId !== currentUser.id) {
+      return;
+    }
+
     if (selectedEval && evaluation.id !== selectedEval) {
       return;
     }
 
-    evaluation.copies.forEach((copy) => {
+    evaluation.copies.forEach(function (copy) {
       const classMatch = !selectedClass || normalizeForSearch(copy.studentClass).includes(selectedClass);
       const studentMatch = !selectedStudent || normalizeForSearch(copy.studentName).includes(selectedStudent);
 
       if (classMatch && studentMatch) {
-        rows.push({
-          evaluation: evaluation,
-          copy: copy
-        });
+        rows.push({ evaluation: evaluation, copy: copy });
       }
     });
   });
 
   if (rows.length === 0) {
-    classResultsBody.innerHTML = `
-      <tr>
-        <td colspan="8">Aucun résultat trouvé.</td>
-      </tr>
-    `;
+    body.innerHTML = `<tr><td colspan="8">Aucun résultat trouvé.</td></tr>`;
     return;
   }
 
-  classResultsBody.innerHTML = "";
+  body.innerHTML = "";
 
-  rows.forEach((item) => {
+  rows.forEach(function (item) {
     const tr = document.createElement("tr");
 
     tr.innerHTML = `
@@ -518,63 +614,56 @@ function renderClassResults() {
       <td>${escapeHTML(item.copy.appreciation)}</td>
     `;
 
-    classResultsBody.appendChild(tr);
+    body.appendChild(tr);
   });
 }
 
 function clearFilters() {
-  filterEvaluation.value = "";
-  filterClass.value = "";
-  filterStudent.value = "";
+  document.getElementById("filterEvaluation").value = "";
+  document.getElementById("filterClass").value = "";
+  document.getElementById("filterStudent").value = "";
   renderClassResults();
 }
 
 function searchStudentResults() {
-  const name = normalizeForSearch(searchStudentName.value);
-  const classe = normalizeForSearch(searchStudentClass.value);
-  const date = searchEvaluationDate.value;
+  const name = normalizeForSearch(document.getElementById("searchStudentName").value);
+  const classe = normalizeForSearch(document.getElementById("searchStudentClass").value);
+  const date = document.getElementById("searchEvaluationDate").value;
+  const box = document.getElementById("studentResultsBox");
 
-  if (!name) {
-    alert("Veuillez renseigner votre nom.");
-    return;
-  }
-
-  if (!classe) {
-    alert("Veuillez renseigner votre classe.");
+  if (!name || !classe) {
+    alert("Veuillez renseigner votre nom et votre classe.");
     return;
   }
 
   const results = [];
 
-  evaluations.forEach((evaluation) => {
+  evaluations.forEach(function (evaluation) {
     if (date && evaluation.date !== date) {
       return;
     }
 
-    evaluation.copies.forEach((copy) => {
+    evaluation.copies.forEach(function (copy) {
       const nameMatch = normalizeForSearch(copy.studentName).includes(name);
       const classMatch = normalizeForSearch(copy.studentClass) === classe;
 
       if (nameMatch && classMatch) {
-        results.push({
-          evaluation: evaluation,
-          copy: copy
-        });
+        results.push({ evaluation: evaluation, copy: copy });
       }
     });
   });
 
   if (results.length === 0) {
-    studentResultsBox.innerHTML = `
-      <p>Aucun résultat trouvé pour ces informations.</p>
-      <p>Vérifiez l’orthographe de votre nom, votre classe ou la date saisie.</p>
+    box.innerHTML = `
+      <p>Aucun résultat trouvé.</p>
+      <p>Vérifiez votre nom, votre classe ou la date d’évaluation.</p>
     `;
     return;
   }
 
-  studentResultsBox.innerHTML = "";
+  box.innerHTML = "";
 
-  results.forEach((item) => {
+  results.forEach(function (item) {
     const div = document.createElement("div");
     div.className = "result-card-student";
 
@@ -588,24 +677,27 @@ function searchStudentResults() {
       <p><strong>Appréciation :</strong> ${escapeHTML(item.copy.appreciation)}</p>
     `;
 
-    studentResultsBox.appendChild(div);
+    box.appendChild(div);
   });
 }
 
 function clearStudentSearch() {
-  searchStudentName.value = "";
-  searchStudentClass.value = "";
-  searchEvaluationDate.value = "";
-  studentResultsBox.innerHTML = "Aucun résultat recherché pour le moment.";
+  document.getElementById("searchStudentName").value = currentUser ? currentUser.name : "";
+  document.getElementById("searchStudentClass").value = currentUser ? currentUser.classe || "" : "";
+  document.getElementById("searchEvaluationDate").value = "";
+  document.getElementById("studentResultsBox").innerHTML = "Aucun résultat recherché pour le moment.";
 }
 
 function exportAllResults() {
   const lines = [];
-
   lines.push("Date;Dictée;Classe;Élève;Score;Note;Barème;Erreurs;Appréciation");
 
-  evaluations.forEach((evaluation) => {
-    evaluation.copies.forEach((copy) => {
+  evaluations.forEach(function (evaluation) {
+    if (currentUser && currentUser.role === "enseignant" && evaluation.teacherId !== currentUser.id) {
+      return;
+    }
+
+    evaluation.copies.forEach(function (copy) {
       lines.push([
         evaluation.date,
         evaluation.title,
@@ -625,15 +717,13 @@ function exportAllResults() {
     return;
   }
 
-  const content = lines.join("\n");
-
-  const blob = new Blob([content], {
+  const blob = new Blob([lines.join("\n")], {
     type: "text/csv;charset=utf-8"
   });
 
   const url = URL.createObjectURL(blob);
-
   const link = document.createElement("a");
+
   link.href = url;
   link.download = "resultats_dictee_coach_ia.csv";
   link.click();
@@ -642,103 +732,73 @@ function exportAllResults() {
 }
 
 function resetApplication() {
-  if (!confirm("Voulez-vous vraiment supprimer toutes les évaluations et tous les résultats ?")) {
+  if (!confirm("Voulez-vous supprimer toutes vos évaluations et résultats ?")) {
     return;
   }
 
-  localStorage.removeItem("dicteeCoachEvaluations");
-  evaluations = [];
-  lastCorrection = null;
+  if (currentUser && currentUser.role === "enseignant") {
+    evaluations = evaluations.filter(function (evaluation) {
+      return evaluation.teacherId !== currentUser.id;
+    });
+  }
 
+  saveEvaluations();
   populateEvaluationSelects();
-  renderClassResults();
-  clearEvaluationForm();
-  clearCopyForm();
-  clearStudentSearch();
+  updateDashboardStats();
 
-  alert("Application réinitialisée.");
-  showHome();
+  alert("Données réinitialisées.");
+  showTeacherDashboard();
 }
 
 async function scanTeacherImage() {
-  const file = teacherImageInput.files[0];
+  const file = document.getElementById("teacherImageInput").files[0];
 
   if (!file) {
-    alert("Veuillez d’abord choisir ou prendre une photo du modèle de dictée.");
+    alert("Veuillez choisir une image.");
     return;
   }
 
-  setScanStatus(teacherScanStatus, "Lecture de l’image en cours... Veuillez patienter.", "");
-  scanTeacherBtn.disabled = true;
+  const status = document.getElementById("teacherScanStatus");
+  const button = document.getElementById("scanTeacherBtn");
+
+  setScanStatus(status, "Lecture de l’image en cours...", "");
+  button.disabled = true;
 
   try {
-    const extractedText = await extractTextFromImage(file, teacherScanStatus);
-    referenceText.value = cleanOCRText(extractedText);
+    const text = await extractTextFromImage(file, status);
+    document.getElementById("referenceText").value = cleanOCRText(text);
 
-    if (referenceText.value.trim()) {
-      setScanStatus(
-        teacherScanStatus,
-        "Texte extrait avec succès. Vérifiez-le avant d’enregistrer l’évaluation.",
-        "success-status"
-      );
-    } else {
-      setScanStatus(
-        teacherScanStatus,
-        "Aucun texte n’a été reconnu. Veuillez reprendre la photo plus clairement.",
-        "error-status"
-      );
-    }
+    setScanStatus(status, "Texte extrait. Vérifiez-le avant l’enregistrement.", "success-status");
   } catch (error) {
-    console.error(error);
-
-    setScanStatus(
-      teacherScanStatus,
-      "Erreur lors de la lecture de l’image. Essayez avec une photo plus nette.",
-      "error-status"
-    );
+    setScanStatus(status, "Erreur de lecture. Essayez avec une photo plus nette.", "error-status");
   } finally {
-    scanTeacherBtn.disabled = false;
+    button.disabled = false;
   }
 }
 
 async function scanStudentImage() {
-  const file = studentImageInput.files[0];
+  const file = document.getElementById("studentImageInput").files[0];
 
   if (!file) {
-    alert("Veuillez d’abord choisir ou prendre une photo de la copie manuscrite.");
+    alert("Veuillez choisir une image.");
     return;
   }
 
-  setScanStatus(studentScanStatus, "Lecture de la copie en cours... Veuillez patienter.", "");
-  scanStudentBtn.disabled = true;
+  const status = document.getElementById("studentScanStatus");
+  const button = document.getElementById("scanStudentBtn");
+
+  setScanStatus(status, "Lecture de la copie en cours...", "");
+  button.disabled = true;
 
   try {
-    const extractedText = await extractTextFromImage(file, studentScanStatus);
-    studentText.value = cleanOCRText(extractedText);
+    const text = await extractTextFromImage(file, status);
+    document.getElementById("studentText").value = cleanOCRText(text);
 
-    if (studentText.value.trim()) {
-      setScanStatus(
-        studentScanStatus,
-        "Texte extrait avec succès. Vérifiez-le avant de lancer la correction.",
-        "success-status"
-      );
-    } else {
-      setScanStatus(
-        studentScanStatus,
-        "Aucun texte n’a été reconnu. Veuillez reprendre la photo plus clairement.",
-        "error-status"
-      );
-    }
+    setScanStatus(status, "Texte extrait. Relisez-le avant correction.", "success-status");
   } catch (error) {
-    console.error(error);
-
-    setScanStatus(
-      studentScanStatus,
-      "Erreur lors de la lecture de la copie. Essayez avec une photo plus nette.",
-      "error-status"
-    );
+    setScanStatus(status, "Erreur de lecture. Essayez avec une photo plus nette.", "error-status");
   } finally {
-    scanStudentBtn.disabled = false;
+    button.disabled = false;
   }
 }
 
@@ -749,41 +809,53 @@ async function extractTextFromImage(file, statusElement) {
 
   const imageURL = URL.createObjectURL(file);
 
-  const result = await Tesseract.recognize(
-    imageURL,
-    "fra",
-    {
-      logger: function (message) {
-        if (message.status === "recognizing text") {
-          const progress = Math.round(message.progress * 100);
-
-          setScanStatus(
-            statusElement,
-            `Reconnaissance du texte : ${progress}%`,
-            ""
-          );
-        } else if (message.status) {
-          setScanStatus(
-            statusElement,
-            `Préparation : ${message.status}`,
-            ""
-          );
-        }
+  const result = await Tesseract.recognize(imageURL, "fra", {
+    logger: function (message) {
+      if (message.status === "recognizing text") {
+        const progress = Math.round(message.progress * 100);
+        setScanStatus(statusElement, `Reconnaissance du texte : ${progress}%`, "");
       }
     }
-  );
+  });
 
   URL.revokeObjectURL(imageURL);
 
   return result.data.text;
 }
 
-function cleanOCRText(text) {
-  return text
-    .replace(/\n+/g, " ")
-    .replace(/\s+/g, " ")
-    .replace(/[|]/g, "I")
-    .trim();
+function updateDashboardStats() {
+  if (!currentUser || currentUser.role !== "enseignant") return;
+
+  const myEvaluations = evaluations.filter(function (evaluation) {
+    return evaluation.teacherId === currentUser.id;
+  });
+
+  let copies = [];
+  myEvaluations.forEach(function (evaluation) {
+    copies = copies.concat(evaluation.copies);
+  });
+
+  const average = copies.length
+    ? Math.round(copies.reduce(function (sum, copy) {
+        return sum + copy.score;
+      }, 0) / copies.length)
+    : 0;
+
+  document.getElementById("statEvaluations").textContent = myEvaluations.length;
+  document.getElementById("statCopies").textContent = copies.length;
+  document.getElementById("statAverage").textContent = `${average}%`;
+}
+
+function initializeDate() {
+  const dateInput = document.getElementById("evaluationDate");
+
+  if (dateInput) {
+    dateInput.value = new Date().toISOString().split("T")[0];
+  }
+}
+
+function generateId(prefix) {
+  return `${prefix}_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
 }
 
 function normalizeText(text) {
@@ -796,72 +868,36 @@ function normalizeText(text) {
 }
 
 function splitWords(text) {
-  const cleanText = normalizeText(text);
+  const clean = normalizeText(text);
+  return clean ? clean.split(" ") : [];
+}
 
-  if (!cleanText) {
-    return [];
-  }
-
-  return cleanText.split(" ");
+function cleanOCRText(text) {
+  return text
+    .replace(/\n+/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/[|]/g, "I")
+    .trim();
 }
 
 function detectErrorType(expected, given) {
-  if (given === "mot manquant") {
-    return "Mot oublié";
-  }
-
-  if (expected.length === given.length) {
-    return "Erreur d’orthographe possible";
-  }
-
-  if (expected.startsWith(given) || given.startsWith(expected)) {
-    return "Mot incomplet ou accord oublié";
-  }
-
-  if (Math.abs(expected.length - given.length) <= 2) {
-    return "Erreur proche du mot attendu";
-  }
-
+  if (given === "mot manquant") return "Mot oublié";
+  if (expected.length === given.length) return "Erreur d’orthographe possible";
+  if (expected.startsWith(given) || given.startsWith(expected)) return "Mot incomplet ou accord oublié";
+  if (Math.abs(expected.length - given.length) <= 2) return "Erreur proche du mot attendu";
   return "Mot différent";
 }
 
-function getAppreciation(score, name) {
-  if (score >= 90) {
-    return {
-      title: `Excellent travail, ${name} !`,
-      message: "Excellent travail. La dictée est très bien maîtrisée."
-    };
-  }
-
-  if (score >= 70) {
-    return {
-      title: `Bon travail, ${name} !`,
-      message: "Bon travail. Les acquis sont présents, mais quelques erreurs doivent être reprises."
-    };
-  }
-
-  if (score >= 50) {
-    return {
-      title: `Courage, ${name} !`,
-      message: "Résultat moyen. Il faut renforcer l’orthographe, les accords et la relecture."
-    };
-  }
-
-  return {
-    title: `À reprendre avec accompagnement, ${name}.`,
-    message: "Des difficultés importantes sont observées. Une remédiation est nécessaire."
-  };
+function getAppreciation(score) {
+  if (score >= 90) return "Excellent travail. La dictée est très bien maîtrisée.";
+  if (score >= 70) return "Bon travail. Quelques erreurs doivent être reprises.";
+  if (score >= 50) return "Résultat moyen. Il faut renforcer l’orthographe et la relecture.";
+  return "Des difficultés importantes sont observées. Une remédiation est nécessaire.";
 }
 
 function getScoreClass(score) {
-  if (score >= 70) {
-    return "score-good";
-  }
-
-  if (score >= 50) {
-    return "score-medium";
-  }
-
+  if (score >= 70) return "score-good";
+  if (score >= 50) return "score-medium";
   return "score-low";
 }
 
@@ -874,15 +910,11 @@ function normalizeForSearch(text) {
 }
 
 function formatDate(dateString) {
-  if (!dateString) {
-    return "";
-  }
+  if (!dateString) return "";
 
   const parts = dateString.split("-");
 
-  if (parts.length !== 3) {
-    return dateString;
-  }
+  if (parts.length !== 3) return dateString;
 
   return `${parts[2]}/${parts[1]}/${parts[0]}`;
 }
@@ -909,13 +941,3 @@ function escapeCSV(value) {
   const stringValue = String(value ?? "");
   return `"${stringValue.replaceAll('"', '""')}"`;
 }
-
-window.addEventListener("load", () => {
-  loadEvaluations();
-  populateEvaluationSelects();
-
-  const today = new Date().toISOString().split("T")[0];
-  evaluationDate.value = today;
-
-  showHome();
-});
