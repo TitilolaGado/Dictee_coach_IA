@@ -4,9 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Dictée Coach IA</title>
+  <title>Dictée Coach IA — Chaque mot compte</title>
+<meta name="description" content="Préparez vos dictées, corrigez les copies et accompagnez chaque progrès." />
+
 
   <link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="upgrade.css" />
+<link rel="stylesheet" href="interface.css" />
 </head>
 
 <body>
@@ -20,38 +24,41 @@
       </div>
     </div>
 
+    <nav class="header-nav" aria-label="Navigation principale"><a href="#authSection">Mon espace</a><a href="#practiceSection">M’entraîner <span aria-hidden="true">↗</span></a></nav>
     <div class="header-actions">
       <span id="connectedUserBadge" class="user-badge hidden"></span>
       <button id="logoutBtn" class="logout-btn hidden">Déconnexion</button>
     </div>
   </header>
 
+  <div class="welcome-line"><span class="live-dot" aria-hidden="true"></span> LE PLAISIR D’ÉCRIRE, LA FIERTÉ DE PROGRESSER</div>
   <section id="authSection" class="auth-wrapper">
     <div class="auth-card">
       <div class="auth-illustration">
-        <div class="floating-icon">✍️</div>
-        <h2>Bienvenue sur Dictée Coach IA</h2>
+        <img class="hero-art" src="assets/ecrire-ensemble.webp" alt="Deux élèves écrivent avec un compagnon IA dans un univers lumineux." width="1672" height="941" fetchpriority="high" />
+        <div class="hero-copy"><span class="hero-kicker">UN MOT APRÈS L’AUTRE, VOUS AVANCEZ.</span><h2>Écrire ensemble.<br><em>Grandir à chaque mot.</em></h2>
         <p>
-          Une application pédagogique pour aider l’enseignant à corriger les dictées,
+          Un espace pour aider l’enseignant à corriger les dictées,
           suivre les résultats de la classe et permettre aux apprenants de consulter
           leur progression.
-        </p>
+        </p><div class="hero-tags"><span>✦ Apprendre à son rythme</span><span>↗ Valoriser chaque progrès</span></div></div>
       </div>
 
       <div class="auth-panel">
-        <div class="tabs">
+        <div class="panel-intro"><span class="eyebrow">VOTRE PROCHAIN PROGRÈS COMMENCE ICI</span><h2>Bienvenue dans<br>votre espace.</h2><p>Enseignant ou apprenant, avançons ensemble.</p></div><details class="storage-info"><summary>À savoir sur vos données</summary><p>Mode local : comptes et résultats sur cet appareil uniquement. Cette connexion ne constitue pas une authentification sécurisée.</p></details><div class="tabs">
           <button id="loginTabBtn" class="tab active">Connexion</button>
           <button id="registerTabBtn" class="tab">Inscription</button>
         </div>
 
         <form id="loginForm" class="auth-form">
-          <h3>Se connecter</h3>
+          <h3>Heureux de vous retrouver.</h3>
 
           <label for="loginEmail">Email</label>
           <input type="email" id="loginEmail" placeholder="exemple@email.com" />
 
           <label for="loginPassword">Mot de passe</label>
-          <input type="password" id="loginPassword" placeholder="Votre mot de passe" />
+          <input type="password" id="loginPassword" placeholder="Votre mot de passe" autocomplete="current-password" />
+<button type="button" class="password-toggle" data-password="loginPassword" aria-pressed="false">Afficher le mot de passe</button>
 
           <button type="submit">Entrer dans l’application</button>
 
@@ -70,7 +77,8 @@
           <input type="email" id="registerEmail" placeholder="exemple@email.com" />
 
           <label for="registerPassword">Mot de passe</label>
-          <input type="password" id="registerPassword" placeholder="Créer un mot de passe" />
+          <input type="password" id="registerPassword" placeholder="Créer un mot de passe" autocomplete="new-password" />
+<button type="button" class="password-toggle" data-password="registerPassword" aria-pressed="false">Afficher le mot de passe</button>
 
           <label for="registerRole">Profil</label>
           <select id="registerRole">
@@ -92,7 +100,8 @@
     </div>
   </section>
 
-  <section id="homeSection" class="home-section hidden">
+  <section class="pathway-strip" aria-label="Un parcours adapté à votre classe"><article><span class="path-icon">01</span><div><h3>Écouter & écrire</h3><p>En classe, sur feuille ou en entraînement.</p></div></article><article><span class="path-icon">02</span><div><h3>Comprendre & corriger</h3><p>Relire les mots, repérer les difficultés.</p></div></article><article><span class="path-icon">03</span><div><h3>Progresser & réussir</h3><p>Un accompagnement, pas à pas.</p></div></article></section>
+<section id="homeSection" class="home-section hidden">
     <div class="hero-card">
       <div>
         <span class="pill">Application ludique de dictée</span>
@@ -100,7 +109,7 @@
         <p id="welcomeText">Choisissez votre espace pour commencer.</p>
       </div>
 
-      <div class="hero-emoji">📘✨</div>
+      <img class="home-visual" src="assets/ecrire-ensemble.webp" width="400" height="225" alt="Élèves et compagnon IA découvrant le plaisir d’écrire." loading="lazy" />
     </div>
 
     <div class="home-buttons">
@@ -110,6 +119,19 @@
   </section>
 
   <main class="container">
+<section class="card practice-card" id="practiceSection">
+<div class="inspiration-banner"><img src="assets/voyage-des-mots.webp" alt="Un livre ouvert mène vers une étoile dans un univers numérique." width="1200" height="800" loading="lazy" /><div><span class="eyebrow">VOTRE AVENTURE COMMENCE ICI</span><h2>Les mots ouvrent<br>tous les possibles.</h2><p>Un essai. Une découverte. Un progrès.</p><a href="#practiceAnswer" class="start-link">Relever le défi ↓</a></div></div>
+<div class="journey-stats" aria-label="Votre progression sur cet appareil"><div><strong id="journeyAttempts">0</strong><span>Défis terminés</span></div><div><strong id="journeyBest">—</strong><span>Meilleur score</span></div><div><strong id="journeyStars">0 / 3</strong><span>Étoiles gagnées</span></div></div>
+<div class="badges" aria-label="Badges de progression"><span id="badgeFirst">✦ Premier pas</span><span id="badgeExplorer">◈ Les trois chemins</span><span id="badgeMaster">★ Sans faute</span></div>
+<p class="hint">Gagnez une étoile par niveau en atteignant 80 %. Vos badges restent sur cet appareil.</p>
+<div class="practice-heading"><div><span class="eyebrow">LE DÉCLIC DU JOUR</span><h2>Une petite dictée, un grand pas.</h2><p>Entraînez-vous librement, sans créer de compte.</p></div><span class="practice-symbol" aria-hidden="true">Aa</span></div>
+<div class="form-grid"><div><label for="practiceLevel">Choisir un niveau</label><select id="practiceLevel"><option value="0">Découverte · 1 phrase</option><option value="1">Intermédiaire · 2 phrases</option><option value="2">Défi · accords et homophones</option></select></div><div><label for="speechRate">Vitesse de lecture</label><select id="speechRate"><option value="0.65">Lente</option><option value="0.85" selected>Normale</option><option value="1">Rapide</option></select></div></div>
+<div class="actions"><button id="listenPractice" type="button">▶ Écouter la dictée</button><button id="stopSpeech" class="secondary" type="button">Arrêter la lecture</button></div>
+<label for="practiceAnswer">À vous d’écrire</label><textarea id="practiceAnswer" placeholder="Écoutez, écrivez, puis relisez votre texte…" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+<div class="actions"><button id="checkPractice" type="button">Vérifier ma dictée</button><button id="resetPractice" class="secondary" type="button">Recommencer</button></div>
+<p class="hint">Comparaison automatique des mots : les accents comptent ; la ponctuation et les majuscules sont ignorées. Le score est indicatif.</p>
+<div id="practiceFeedback" aria-live="polite"></div><div class="encouragement"><span aria-hidden="true">✦</span><p>« Chaque erreur vous montre le prochain pas à faire. »<br><small>Prenez votre temps. Vous êtes en train d’apprendre.</small></p></div>
+</section>
 
     <section class="card hidden-section" id="teacherDashboardSection">
       <h2>Tableau de bord enseignant</h2>
@@ -121,6 +143,7 @@
 
       <div class="dashboard-grid">
         <button id="showCreateEvaluationBtn">➕ Créer une évaluation</button>
+        <button id="showPaperCopiesBtn" class="secondary">📷 Traiter les copies sur papier</button>
         <button id="showCorrectCopyBtn" class="secondary">📝 Ajouter / corriger une copie</button>
         <button id="showClassResultsBtn" class="secondary">📊 Résultats et suivi de la classe</button>
         <button id="exportAllBtn" class="secondary">📥 Exporter les résultats</button>
@@ -146,7 +169,16 @@
       </div>
     </section>
 
-    <section class="card hidden-section" id="createEvaluationSection">
+    <section class="card hidden-section" id="paperCopiesSection">
+<span class="eyebrow">DE LA FEUILLE À LA CORRECTION</span><h2>Dictée orale · Copies sur papier</h2><p>L’enseignant dicte en classe. Les apprenants écrivent sur feuille. Photographiez ou scannez ensuite les copies pour préparer leur correction ici.</p>
+<ol class="paper-steps"><li>Créer l’évaluation et saisir le texte dicté.</li><li>Importer les copies, une copie par fichier.</li><li>Identifier chaque élève et vérifier la transcription.</li><li>Corriger, puis compléter l’appréciation pédagogique.</li></ol>
+<p class="local-notice">Photos nettes, feuille à plat, lumière homogène, sans ombre ni doigt sur le texte. Le moteur actuel reconnaît surtout le texte imprimé : la lecture manuscrite peut nécessiter une retranscription importante. Recopiez fidèlement les fautes de l’élève, sans les corriger avant l’analyse.</p>
+<label for="paperFiles">Choisir des photos ou scans (20 fichiers maximum, 15 Mo par fichier)</label><input id="paperFiles" type="file" multiple accept="image/jpeg,image/png,image/webp,application/pdf" />
+<label for="paperCamera">Ou photographier une copie avec le téléphone</label><input id="paperCamera" type="file" accept="image/*" capture="environment" />
+<p class="hint">JPEG, PNG et WebP : aperçu et tentative de lecture automatique. PDF : aperçu dans un nouvel onglet et transcription manuelle ; convertissez ses pages en images pour utiliser la lecture automatique. Pour plusieurs pages, importez une page puis complétez la transcription avec les suivantes avant de corriger.</p>
+<div class="actions"><button id="clearPaperQueue" class="secondary">Vider les imports</button><button class="secondary backDashboardBtn">Retour au tableau de bord</button></div><p id="paperStatus" role="status"></p><div id="paperQueue"></div>
+<p class="hint">Les fichiers importés restent temporaires dans cet onglet et ne sont pas sauvegardés avec les notes. Les transcriptions validées sont enregistrées localement avec la correction. Ne fermez pas la page avant d’avoir terminé.</p></section>
+<section class="card hidden-section" id="createEvaluationSection">
       <h2>Créer une évaluation de dictée</h2>
 
       <div class="form-grid">
@@ -450,5 +482,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="script.js"></script>
+<script src="upgrade.js"></script>
+<script src="paper-copies.js"></script>
+<script src="interface.js"></script>
 </body>
 </html>

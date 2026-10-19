@@ -213,6 +213,7 @@ function updateAuthUI() {
 function hideAllAppSections() {
   const sections = [
     "teacherDashboardSection",
+    "paperCopiesSection",
     "createEvaluationSection",
     "correctCopySection",
     "singleResultSection",
@@ -289,7 +290,8 @@ function saveEvaluation() {
   const title = document.getElementById("evaluationTitle").value.trim();
   const classe = document.getElementById("evaluationClass").value.trim();
   const date = document.getElementById("evaluationDate").value;
-  const scale = Number(document.getElementById("evaluationScale").value) || 20;
+  const scale = Number(document.getElementById("evaluationScale").value);
+  if (!Number.isFinite(scale) || scale <= 0 || scale > 100) { alert("Choisissez un barème entre 1 et 100."); return; }
   const text = document.getElementById("referenceText").value.trim();
 
   if (!title || !classe || !date || !text) {
@@ -416,6 +418,7 @@ function correctAndSaveCopy() {
     return;
   }
 
+  if (splitWords(evaluation.referenceText).length > 1500 || splitWords(text).length > 1500) { alert("Limite de 1 500 mots par copie."); return; }
   const correction = compareTexts(evaluation.referenceText, text);
   const note = Math.round((correction.score / 100) * evaluation.scale * 100) / 100;
   const appreciation = getAppreciation(correction.score);
@@ -472,64 +475,26 @@ function clearCopyForm() {
 }
 
 function compareTexts(reference, student) {
-  const referenceWords = splitWords(reference);
-  const studentWords = splitWords(student);
-
-  let correctCount = 0;
-  let errors = [];
-  let outputHTML = "";
-
-  const maxLength = Math.max(referenceWords.length, studentWords.length);
-
-  for (let i = 0; i < maxLength; i++) {
-    const expected = referenceWords[i] || "";
-    const given = studentWords[i] || "";
-
-    if (expected && given && expected === given) {
-      correctCount++;
-      outputHTML += `<span class="word-correct">${escapeHTML(given)}</span> `;
-    } else if (expected && given && expected !== given) {
-      errors.push({
-        position: i + 1,
-        expected: expected,
-        given: given,
-        type: detectErrorType(expected, given)
-      });
-
-      outputHTML += `<span class="word-error">${escapeHTML(given)}</span> `;
-      outputHTML += `<span class="word-missing">→ ${escapeHTML(expected)}</span> `;
-    } else if (expected && !given) {
-      errors.push({
-        position: i + 1,
-        expected: expected,
-        given: "mot manquant",
-        type: "Mot oublié"
-      });
-
-      outputHTML += `<span class="word-missing">+ ${escapeHTML(expected)}</span> `;
-    } else if (!expected && given) {
-      errors.push({
-        position: i + 1,
-        expected: "aucun mot attendu",
-        given: given,
-        type: "Mot ajouté"
-      });
-
-      outputHTML += `<span class="word-error">${escapeHTML(given)}</span> `;
-    }
+  const a = splitWords(reference), b = splitWords(student);
+  if (a.length > 1500 || b.length > 1500) throw new Error("Limite de 1 500 mots par copie.");
+  const d = Array.from({length:a.length+1}, () => new Uint16Array(b.length+1));
+  for(let i=0;i<=a.length;i++) d[i][0]=i;
+  for(let j=0;j<=b.length;j++) d[0][j]=j;
+  for(let i=1;i<=a.length;i++) for(let j=1;j<=b.length;j++)
+    d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+  let i=a.length,j=b.length, correctCount=0; const ops=[];
+  while(i||j){
+    if(i&&j&&d[i][j]===d[i-1][j-1]+(a[i-1]===b[j-1]?0:1)){
+      ops.push({expected:a[i-1],given:b[j-1],position:i,type:a[i-1]===b[j-1]?null:detectErrorType(a[i-1],b[j-1])});i--;j--;
+    }else if(i&&d[i][j]===d[i-1][j]+1){ops.push({expected:a[i-1],given:"mot manquant",position:i,type:"Mot oublié"});i--;}
+    else{ops.push({expected:"aucun mot attendu",given:b[j-1],position:i+1,type:"Mot ajouté"});j--;}
   }
-
-  const score = referenceWords.length
-    ? Math.round((correctCount / referenceWords.length) * 100)
-    : 0;
-
-  return {
-    score: score,
-    correctCount: correctCount,
-    totalWords: referenceWords.length,
-    errors: errors,
-    outputHTML: outputHTML
-  };
+  ops.reverse(); const errors=[];let outputHTML="";
+  for(const op of ops){
+    if(!op.type){correctCount++;outputHTML+=`<span class="word-correct">${escapeHTML(op.given)}</span> `;}
+    else {errors.push(op);outputHTML+=`<span class="word-error">${escapeHTML(op.given)}</span> <span class="word-missing">→ ${escapeHTML(op.expected)}</span> `;}
+  }
+  return {score:a.length?Math.max(0,Math.round((1-errors.length/a.length)*100)):0,correctCount,totalWords:a.length,errors,outputHTML};
 }
 
 function renderSingleResult(evaluation, result) {
@@ -1016,6 +981,7 @@ function generateId(prefix) {
 
 function normalizeText(text) {
   return text
+    .normalize("NFC")
     .trim()
     .replace(/[’]/g, "'")
     .replace(/[.,;:!?()"]/g, "")

@@ -1,0 +1,7 @@
+Images créées avec le générateur d’images intégré, puis optimisées en WebP pour le site.
+
+atelier-ia.webp
+Use case: stylized-concept. Asset type: hero illustration for French educational app Dictée Coach IA. Create beautiful premium 3D editorial illustration, wide landscape. Two Black West African teenage students, girl and boy, enjoying writing in an open notebook next to a tablet, with a friendly small floating AI robot companion, holographic floating alphabet letters and luminous flowing connections. Inspiring and playful, sophisticated indigo blue and violet with cyan light and warm golden accents, soft tactile clay textures, cinematic soft lighting, expressive natural faces. Balanced composition, uncluttered background, no words, no logos, no watermark. Full bleed illustration.
+
+voyage-des-mots.webp
+Use case: stylized-concept. Asset type: educational app inspiration banner, wide landscape. A wonderful imaginative floating island of knowledge: an open book forming a luminous pathway towards a small shining golden star, elegant floating alphabet letters, a pencil and gentle orbital tech circuits. Tiny charming rounded friendly blue AI robot pointing towards the star. Premium 3D illustration matching indigo violet cyan and gold palette, soft clay textures, optimistic magical lighting, tasteful and playful for teenagers and teachers, not babyish. Spacious composition with ample dark indigo negative space at left for HTML text overlay. No text, no words, no logos, no watermark.
